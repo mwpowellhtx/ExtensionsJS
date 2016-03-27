@@ -1,0 +1,20 @@
+﻿<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title>Test Fixture</title>
+    <script type="text/javascript" src="Content/Scripts/Extensions/str.js"></script>
+</head>
+<body>
+    <!-- none of this is server side, it is all client side -->
+    &quot;<span id="message"></span>&quot; <span id="doesOrDoesNot"></span> contain &quot;<span id="subMessage"></span>&quot;.
+    <script type="text/javascript">
+        var catsAndDogs = 'cats and dogs';
+        var dog = 'dog';
+        var doc = document;
+        doc.getElementById('message').textContent = catsAndDogs;
+        var result = catsAndDogs.contains(dog);
+        doc.getElementById('doesOrDoesNot').textContent = (result ? "does" : "does not");
+        doc.getElementById('subMessage').textContent = dog;
+    </script>
+</body>
+</html>
