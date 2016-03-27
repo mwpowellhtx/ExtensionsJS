@@ -2,19 +2,29 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
     <title>Test Fixture</title>
-    <script type="text/javascript" src="Content/Scripts/Extensions/str.js"></script>
+    <script type="text/javascript" src="Content/Scripts/ExtensionsJS/str.js"></script>
+    <script type="text/javascript">
+        function testWhetherWhatContainsWhat(message, x, expected) {
+            var actual = message.contains(x);
+            //assert(actual === expected);
+            document.write('&quot;' + message + '&quot; '
+                + (actual ? 'does' : 'does not') + ' contain &quot;' + x + '&quot;');
+        }
+    </script>
 </head>
 <body>
+
     <!-- none of this is server side, it is all client side -->
-    &quot;<span id="message"></span>&quot; <span id="doesOrDoesNot"></span> contain &quot;<span id="subMessage"></span>&quot;.
     <script type="text/javascript">
-        var catsAndDogs = 'cats and dogs';
-        var dog = 'dog';
-        var doc = document;
-        doc.getElementById('message').textContent = catsAndDogs;
-        var result = catsAndDogs.contains(dog);
-        doc.getElementById('doesOrDoesNot').textContent = (result ? "does" : "does not");
-        doc.getElementById('subMessage').textContent = dog;
+        testWhetherWhatContainsWhat('cats and dogs', 'dog', true);
     </script>
+
+    <br />
+
+    <!-- none of this is server side, it is all client side -->
+    <script type="text/javascript">
+        testWhetherWhatContainsWhat('rain and snow', 'cats', false);
+    </script>
+
 </body>
 </html>
