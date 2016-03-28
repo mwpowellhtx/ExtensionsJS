@@ -12,4 +12,6 @@ Provides JavaScript extension methods extending static and prototype functionali
 
 * I would like to distribute minified versions of the packaged files. However, until it is, right now it is not a very high priority in the early stages.
 
+* I would also like to provide IntelliSense style comments to the features. However, like with minification, this is a low priority right at the moment.
+
 * The current features are by no means exhaustive. Contributions are welcome; the only thing I ask is that you include sensible *unit tests*, of a sort, through the embedded HTML files (not intended for distribution).
