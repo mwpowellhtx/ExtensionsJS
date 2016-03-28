@@ -1,0 +1,20 @@
+<?xml version='1.0'?>
+<package xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <metadata xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+    <id>ExtensionsJS.String</id>
+    <title>ExtensionsJS.String</title>
+    <version>1.0.2</version>
+    <authors>Michael W. Powell</authors>
+    <owners>mwpowellhtx</owners>
+    <licenseUrl>http://github.com/mwpowellhtx/ExtensionsJS.String/raw/master/LICENSE.txt</licenseUrl>
+    <projectUrl>http://github.com/mwpowellhtx/ExtensionsJS.String</projectUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>Provides useful prototype methods extending String functionality.</description>
+    <tags>JavaScript String prototype contains</tags>
+    <language>en-US</language>
+  </metadata>
+  <files>
+    <file src="bin\Content\Scripts\ExtensionsJS\str.js" target="Content\Scripts\ExtensionsJS\str-1.0.2.js" />
+    <file src="bin\Tools\*.ps1" target="Tools" />
+  </files>
+</package>

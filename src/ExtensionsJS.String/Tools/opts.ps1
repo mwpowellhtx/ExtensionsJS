@@ -1,0 +1,1 @@
+$jsPrefix = "str-"
