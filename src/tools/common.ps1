@@ -57,12 +57,28 @@ function Remove-Reference($scriptsFolderProjectItem, $fileNamePattern) {
     }
 }
 
+# Identify the parent directory for the currently running script
+$scriptPath = split-path -parent $MyInvocation.MyCommand.Definition
+
+# Then dot source the options
+. (Join-Path $scriptPath opts.ps1)
+
+# Identify the parent directory for the currently running script
+$scriptPath = split-path -parent $MyInvocation.MyCommand.Definition
+
+# Then dot source the options
+. (Join-Path $scriptPath opts.ps1)
+
+# Should have a prefix sourced from the options
+$jsPrefix = Get-Prefix
 # Extract the version number from the file in the package's content\scripts\extensionsjs folder
 $packageScriptsFolder = Join-Path $installPath Content\Scripts\ExtensionsJS
 # prefix is signaled from the opts and is the only thing that needs to change from script to script for this particular packaging
-$jsFileName = Join-Path $packageScriptsFolder $jsPrefix + "*.js" | Get-ChildItem -Exclude "*.min.js","*-vsdoc.js" | Split-Path -Leaf
+$jsFileName = $jsPrefix + "*.js"
+$jsFilePath = Join-Path $packageScriptsFolder $jsFileName | Get-ChildItem -Exclude "*.min.js","*-vsdoc.js" | Split-Path -Leaf
 $jsFileNameRegEx = $jsPrefix + "((?:\d+\.)?(?:\d+\.)?(?:\d+\.)?(?:\d+)?(?:(?:-\w*)*)).js"
-$jsFileName -match $jsFileNameRegEx
+$matches = $jsFilePath -match $jsFileNameRegEx
+# Write-Output $jsPrefix $jsFileName $jsFilePath $jsFileNameRegEx $matches
 $ver = $matches[1]
 
 # Get the project item for the scripts folder

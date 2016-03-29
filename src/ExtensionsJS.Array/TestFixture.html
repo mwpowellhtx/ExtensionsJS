@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
     <title>Test Fixture</title>
-    <script type="text/javascript" src="Content/Scripts/ExtensionsJS/arr.js"></script>
+    <script type="text/javascript" src="Scripts/ExtensionsJS/arr.js"></script>
 
     <script type="text/javascript">
         var QUOT = '&quot;';
@@ -18,12 +18,26 @@
             { id: 3, value: 4 },
             { id: 4, value: 5 }
         ];
+        // will report results at the end
+        var results = { passed: 0, failed: 0 };
     </script>
 
     <script type="text/javascript">
 
         function writeReport(r) {
+
+            if (r.passed) {
+                results.passed++;
+            } else {
+                results.failed++;
+            }
+
             document.write(JSON.stringify(r));
+            document.write('<br />');
+        }
+
+        function writeResults() {
+            document.write('PASSED: ' + results.passed + ' FAILED: ' + results.failed);
             document.write('<br />');
         }
 
@@ -40,6 +54,7 @@
                 arr: arr,
                 expected: expected,
                 actual: actual,
+                passed: actual === expected,
                 message: message(actual === expected)
             };
             writeReport(report);
@@ -54,6 +69,7 @@
                 pred: pred,
                 expected: expected,
                 actual: actual,
+                passed: actual === expected,
                 message: message(actual === expected)
             };
             writeReport(report);
@@ -68,6 +84,7 @@
                 pred: pred,
                 expected: expected,
                 actual: actual,
+                passed: actual === expected,
                 message: message(actual === expected)
             };
             writeReport(report);
@@ -83,6 +100,7 @@
                 action: action,
                 expected: expected,
                 confirmed: confirmed,
+                passed: confirmed === expected,
                 message: message(confirmed === expected)
             };
             writeReport(report);
@@ -97,6 +115,7 @@
                 b: b,
                 expected: expected,
                 actual: actual,
+                passed: actual === expected,
                 message: message(actual === expected)
             };
             writeReport(report);
@@ -111,6 +130,7 @@
                 pred: pred,
                 expected: expected,
                 actual: actual,
+                passed: actual === expected,
                 message: message(actual === expected)
             };
             writeReport(report);
@@ -125,6 +145,7 @@
                 pred: pred,
                 expected: expected,
                 actual: actual,
+                passed: actual === expected,
                 message: message(actual === expected)
             };
             writeReport(report);
@@ -141,6 +162,7 @@
                 projected: projected,
                 expected: expected,
                 confirmed: confirmed,
+                passed: confirmed === expected,
                 message: message(confirmed === expected)
             };
             writeReport(report);
@@ -155,6 +177,7 @@
                 getter: getter,
                 expected: expected,
                 actual: actual,
+                passed: actual === expected,
                 message: message(actual === expected)
             };
             writeReport(report);
@@ -169,6 +192,7 @@
                 matched: matched,
                 expected: expected,
                 confirmed: confirmed,
+                passed: confirmed === expected,
                 message: message(confirmed === expected)
             };
             writeReport(report);
@@ -291,6 +315,8 @@
         verifyWhere(strs, function(x) { return !(/\d+/g.test(x)); },
             function(arr) { return arr.length === 3; }, true,
             function(r) { return r ? "PASSED: three strings were non-digits" : "FAILED: incorrect number of non-digits strings" });
+
+        writeResults();
 
     </script>
 
