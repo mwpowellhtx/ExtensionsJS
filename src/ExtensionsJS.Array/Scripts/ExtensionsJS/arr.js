@@ -89,8 +89,8 @@ if (Array.prototype.equals === undefined) {
     }
 }
 
-if (Array.prototype.first === undefined) {
-    Array.prototype.first = function (pred) {
+if (Array.prototype.front === undefined) {
+    Array.prototype.front = function (pred) {
         // could use Array.prototype.find, but this is consistent within arr.js
         pred = pred || function() { return true; }
         //for (let a of this)
@@ -104,8 +104,8 @@ if (Array.prototype.first === undefined) {
     }
 }
 
-if (Array.prototype.last === undefined) {
-    Array.prototype.last = function(pred) {
+if (Array.prototype.back === undefined) {
+    Array.prototype.back = function(pred) {
         // could use Array.prototype.find, but this is consistent within arr.js
         pred = pred || function() { return true; }
         //for (let a of this)
@@ -118,6 +118,8 @@ if (Array.prototype.last === undefined) {
         return null;
     }
 }
+
+// TODO: could potentially turn these into Deque operations as well (one of my favorite data structures ever)
 
 // 'select' may be more of a conflict than is worth it; instead we will name it 'project' i.e. 'projection'
 if (Array.prototype.project === undefined) {

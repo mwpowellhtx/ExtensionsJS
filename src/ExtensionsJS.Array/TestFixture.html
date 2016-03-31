@@ -121,11 +121,11 @@
             writeReport(report);
         }
 
-        function verifyFirst(arr, pred, expected, message) {
-            var actual = arr.first(pred);
+        function verifyFront(arr, pred, expected, message) {
+            var actual = arr.front(pred);
             //assert(actual == expected);
             var report = {
-                name: "first",
+                name: "front",
                 arr: arr,
                 pred: pred,
                 expected: expected,
@@ -136,11 +136,11 @@
             writeReport(report);
         }
 
-        function verifyLast(arr, pred, expected, message) {
-            var actual = arr.last(pred);
+        function verifyBack(arr, pred, expected, message) {
+            var actual = arr.back(pred);
             //assert(actual == expected);
             var report = {
-                name: "last",
+                name: "back",
                 arr: arr,
                 pred: pred,
                 expected: expected,
@@ -257,35 +257,35 @@
             function(arr) { return arr.sum(function(x) { return x.value; }); }, -14,
             function(r) { return r ? "PASSED: sum is correct" : "FAILED: sum is incorrect"; });
 
-        verifyFirst(ints, undefined, 1,
-            function(r) { return r ? "PASSED: first is correct" : "FAILED: first is incorrect"; });
+        verifyFront(ints, undefined, 1,
+            function(r) { return r ? "PASSED: front is correct" : "FAILED: front is incorrect"; });
 
-        verifyFirst(chars, undefined, 'a',
-            function(r) { return r ? "PASSED: first is correct" : "FAILED: first is incorrect"; });
+        verifyFront(chars, undefined, 'a',
+            function(r) { return r ? "PASSED: front is correct" : "FAILED: front is incorrect"; });
 
-        verifyFirst(ints, function(x) { return x > 2; }, 3,
-            function(r) { return r ? "PASSED: first is correct" : "FAILED: first is incorrect"; });
+        verifyFront(ints, function(x) { return x > 2; }, 3,
+            function(r) { return r ? "PASSED: front is correct" : "FAILED: front is incorrect"; });
 
-        verifyFirst(chars, function(x) { return x > 'b' }, 'c',
-            function(r) { return r ? "PASSED: first is correct" : "FAILED: first is incorrect"; });
+        verifyFront(chars, function(x) { return x > 'b' }, 'c',
+            function(r) { return r ? "PASSED: front is correct" : "FAILED: front is incorrect"; });
 
-        verifyFirst(chars, function(x) { return x > 'c' }, null,
-            function(r) { return r ? "PASSED: first is correct" : "FAILED: first is incorrect"; });
+        verifyFront(chars, function(x) { return x > 'c' }, null,
+            function(r) { return r ? "PASSED: front is correct" : "FAILED: front is incorrect"; });
 
-        verifyLast(ints, undefined, 4,
-            function(r) { return r ? "PASSED: last is correct" : "FAILED: last is incorrect"; });
+        verifyBack(ints, undefined, 4,
+            function(r) { return r ? "PASSED: back is correct" : "FAILED: back is incorrect"; });
 
-        verifyLast(chars, undefined, 'c',
-            function(r) { return r ? "PASSED: last is correct" : "FAILED: last is incorrect"; });
+        verifyBack(chars, undefined, 'c',
+            function(r) { return r ? "PASSED: back is correct" : "FAILED: back is incorrect"; });
 
-        verifyLast(ints, function(x) { return x < 2; }, 1,
-            function(r) { return r ? "PASSED: last is correct" : "FAILED: last is incorrect"; });
+        verifyBack(ints, function(x) { return x < 2; }, 1,
+            function(r) { return r ? "PASSED: back is correct" : "FAILED: back is incorrect"; });
 
-        verifyLast(chars, function(x) { return x < 'b' }, 'a',
-            function(r) { return r ? "PASSED: last is correct" : "FAILED: last is incorrect"; });
+        verifyBack(chars, function(x) { return x < 'b' }, 'a',
+            function(r) { return r ? "PASSED: back is correct" : "FAILED: back is incorrect"; });
 
-        verifyLast(chars, function(x) { return x < 'a' }, null,
-            function(r) { return r ? "PASSED: last is correct" : "FAILED: last is incorrect"; });
+        verifyBack(chars, function(x) { return x < 'a' }, null,
+            function(r) { return r ? "PASSED: back is correct" : "FAILED: back is incorrect"; });
 
         verifyProject(ints, function(x) { return -x; },
             function(p) { return p.all(function(x) { return x < 0; }) }, true,
@@ -309,7 +309,7 @@
             function(r) { return r ? "PASSED: there are 2 elements in the array" : "FAILED: there are not 2 elements in the array" });
 
         verifyWhere(strs, function(x) { return /\d+/g.test(x); },
-            function(arr) { return arr.length === 1 && arr.first() === '123'; }, true,
+            function(arr) { return arr.length === 1 && arr.front() === '123'; }, true,
             function(r) { return r ? "PASSED: there is one string that is all digits" : "FAILED: there are no strings that are all digits" });
 
         verifyWhere(strs, function(x) { return !(/\d+/g.test(x)); },

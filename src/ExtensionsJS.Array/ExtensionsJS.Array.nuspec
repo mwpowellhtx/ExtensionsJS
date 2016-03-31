@@ -3,7 +3,7 @@
   <metadata xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
     <id>ExtensionsJS.Array</id>
     <title>ExtensionsJS.Array</title>
-    <version>1.0.1</version>
+    <version>1.1.0</version>
     <authors>Michael W. Powell</authors>
     <owners>mwpowellhtx</owners>
     <licenseUrl>http://github.com/mwpowellhtx/ExtensionsJS.Array/raw/master/LICENSE.txt</licenseUrl>
@@ -14,7 +14,7 @@
     <language>en-US</language>
   </metadata>
   <files>
-    <file src="bin\Scripts\ExtensionsJS\arr.js" target="Content\Scripts\ExtensionsJS\arr-1.0.1.js" />
+    <file src="bin\Scripts\ExtensionsJS\arr.js" target="Content\Scripts\ExtensionsJS\arr-1.1.0.js" />
     <file src="bin\Tools\*.ps1" target="tools" />
   </files>
 </package>
