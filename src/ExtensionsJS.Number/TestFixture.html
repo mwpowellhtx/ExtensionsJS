@@ -1,0 +1,33 @@
+﻿<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title>Test Fixture</title>
+    <script type="text/javascript" src="Scripts/ExtensionsJS/number.js"></script>
+    <script type="text/javascript">
+        function testThatValueIsNumeric(x, expected) {
+            var actual = Number.isNumeric(x);
+            //assert(actual === expected);
+            document.writeln('&quot;' + x + '&quot; '
+                + (actual ? 'is' : 'is not') + ' numeric: '
+                + (actual === expected ? 'PASSED' : 'FAILED'));
+            document.writeln('<br />');
+        }
+    </script>
+</head>
+<body>
+
+    <!-- none of this is server side, it is all client side -->
+    <script type="text/javascript">
+        testThatValueIsNumeric(0, true);
+        testThatValueIsNumeric(123, true);
+        testThatValueIsNumeric(-123, true);
+        testThatValueIsNumeric(1.234, true);
+        testThatValueIsNumeric(-1.234, true);
+        testThatValueIsNumeric('blahblahblah', false);
+        testThatValueIsNumeric({}, false);
+        testThatValueIsNumeric([], false);
+        testThatValueIsNumeric(function() {}, false);
+    </script>
+
+</body>
+</html>
