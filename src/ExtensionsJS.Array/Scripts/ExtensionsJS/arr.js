@@ -135,6 +135,20 @@ if (Array.prototype.project === undefined) {
     }
 }
 
+if (Array.prototype.projectMany === undefined) {
+    Array.prototype.projectMany = function(getter) {
+        // either apply the getter across the array or return itself
+        getter = getter || function(x) { return [x]; };
+        var projected = this.project(getter);
+        var concatenated = [];
+        for (var i = 0; i < this.length; i++) {
+            concatenated = concatenated.concat(projected[i]);
+        }
+        /* return the concatenated result */
+        return concatenated;
+    }
+}
+
 if (Array.prototype.sum === undefined) {
     Array.prototype.sum = function(getter) {
         getter = getter || function(a) { return a; };
