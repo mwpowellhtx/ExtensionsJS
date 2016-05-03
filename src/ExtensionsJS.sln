@@ -27,6 +27,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExtensionsJS.Boolean", "Ext
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExtensionsJS.Number", "ExtensionsJS.Number\ExtensionsJS.Number.csproj", "{026D1A4E-FE73-43F0-99B8-BA98F3A3937E}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExtensionsJS.Math", "ExtensionsJS.Math\ExtensionsJS.Math.csproj", "{33C19021-F97F-4368-9DEA-DAEC0F9FDAFA}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -57,6 +59,10 @@ Global
 		{026D1A4E-FE73-43F0-99B8-BA98F3A3937E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{026D1A4E-FE73-43F0-99B8-BA98F3A3937E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{026D1A4E-FE73-43F0-99B8-BA98F3A3937E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{33C19021-F97F-4368-9DEA-DAEC0F9FDAFA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{33C19021-F97F-4368-9DEA-DAEC0F9FDAFA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{33C19021-F97F-4368-9DEA-DAEC0F9FDAFA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{33C19021-F97F-4368-9DEA-DAEC0F9FDAFA}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
