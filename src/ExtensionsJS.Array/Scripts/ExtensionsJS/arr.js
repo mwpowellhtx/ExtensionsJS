@@ -1,3 +1,13 @@
+// ReSharper disable NativeTypePrototypeExtending
+if (Array.prototype.joinDelimited) {
+    Array.prototype.joinDelimited = function(delim) {
+        if (delim === undefined || delim === null) {
+            delim = "-";
+        }
+        return this.join(delim);
+    }
+}
+
 // ReSharper disable PossiblyUnassignedProperty
 if (Array.range === undefined) {
     Array.range = function(start, stop, step) {
@@ -21,7 +31,6 @@ if (Array.range === undefined) {
     }
 }
 
-// ReSharper disable NativeTypePrototypeExtending
 if (Array.prototype.any === undefined) {
     Array.prototype.any = function(pred) {
         pred = pred || function(a) { return a; };
