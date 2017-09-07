@@ -184,3 +184,15 @@ if (Array.prototype.where === undefined) {
         return r;
     }
 }
+
+if (Array.prototype.max === undefined) {
+    Array.prototype.max = function() {
+        return Math.max.apply(null, this);
+    }
+}
+
+if (Array.prototype.min === undefined) {
+    Array.prototype.min = function() {
+        return Math.min.apply(null, this);
+    }
+}

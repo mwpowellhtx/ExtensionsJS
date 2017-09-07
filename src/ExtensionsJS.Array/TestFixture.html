@@ -215,6 +215,20 @@
             writeReport(report);
         }
 
+        function verifyArrayToSingle(arr, func, confirm, expected, message) {
+            var result = func(arr);
+            var confirmed = confirm(result);
+            var report = {
+                name: func.__subject,
+                arr: arr,
+                result: result,
+                confirmed: confirmed,
+                passed: confirmed === expected,
+                message: message(confirmed === expected)
+            };
+            writeReport(report);
+        }
+
     </script>
 </head>
 <body>
@@ -435,7 +449,35 @@
                 return r ? "PASSED: three strings were non-digits" : "FAILED: incorrect number of non-digits strings";
             });
 
-        writeResults();
+        {
+            var func = function(arr) { return arr.min(); };
+
+            // Because EVERYTHING is an object in JavaScript, so we can get away with this.
+            func.__subject = "min";
+
+            verifyArrayToSingle(ints,
+                func,
+                function(x) { return x === 1; },
+                true,
+                function(r) {
+                    return r ? "PASSED: min value was correct" : "FAILED: min value was incorrect";
+                });
+        }
+
+        {
+            var func = function(arr) { return arr.max(); };
+
+            // Because EVERYTHING is an object in JavaScript, so we can get away with this.
+            func.__subject = "max";
+
+            verifyArrayToSingle(ints,
+                func,
+                function(x) { return x === 4; },
+                true,
+                function(r) {
+                    return r ? "PASSED: max value was correct" : "FAILED: max value was incorrect";
+                });
+        }
 
     </script>
 
