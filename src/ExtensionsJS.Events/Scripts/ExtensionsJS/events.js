@@ -39,6 +39,11 @@ var EventDispatcher = function() {
         return this;
     };
 
+    /**
+     * Subscribes to the Event or the Hashed events.
+     * @param {String || Object} eOrHashed The Event Name or a Hashed Callback Object
+     * @param {} callback Optional. The Callback when eOrHashed is the Event Name. Otherwise ignored.
+     */
     this.subscribe = function(eOrHashed, callback) {
 
         if (eOrHashed instanceof Object) {
@@ -52,6 +57,11 @@ var EventDispatcher = function() {
         return this;
     };
 
+    /**
+     * Unsubscribes from the Event
+     * @param {String} e An Event Name from which to unsubscribe
+     * @param {} existingCallback An existing Callback function
+     */
     this.unsubscribe = function(e, existingCallback) {
 
         var subscriptions = this.__dispatcher.__subscriptions;
@@ -72,6 +82,10 @@ var EventDispatcher = function() {
         return this;
     };
 
+    /**
+     * Unsubscribes all of the Callbacks associated with the Event.
+     * @param {String} e An Event Name from which to Unsubscribe All Callbacks
+     */
     this.unsubscribeAll = function(e) {
 
         var subscriptions = this.__dispatcher.__subscriptions[e];
@@ -83,6 +97,12 @@ var EventDispatcher = function() {
         return this;
     };
 
+    /**
+     * Publishes the Args to the event associated with the Event Name.
+     * @param {String} e An Event Name
+     * @param {any} args The arguments to pass along to the Callbacks Subscribed to the Event
+     * @param {} context 
+     */
     this.publish = function(e, args, context) {
 
         var subscriptions = this.__dispatcher.__subscriptions;
@@ -114,6 +134,10 @@ var EventDispatcher = function() {
 }
 
 if (EventDispatcher.setup === undefined) {
+    /**
+     * Sets up an Event Dispatcher associated with the Target.
+     * @param {any} target A Target on which to setup an Event Dispatcher.
+     */
     EventDispatcher.setup = function(target) {
         var dispatcher = new EventDispatcher();
         target.__dispatcher = dispatcher;
@@ -127,6 +151,10 @@ if (EventDispatcher.setup === undefined) {
 }
 
 if (EventDispatcher.teardown === undefined) {
+    /**
+     * Tears down the Event Dispatcher associated with the Target.
+     * @param {any} target A Target from which to tear down the Event Dispatcher.
+     */
     EventDispatcher.teardown = function(target) {
         delete target.publish;
         delete target.unsubscribeAll;
