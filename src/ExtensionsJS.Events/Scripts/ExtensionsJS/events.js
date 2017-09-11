@@ -1,9 +1,12 @@
 var EventDispatcher = function() {
+
+    var ctrl = this;
+
     // TODO: TBD: loosely inspired by the article: http://michd.me/blog/event-driven-javascript-a-simple-event-dispatcher/
     // TODO: TBD: loosely inspired by the article: http://github.com/michd/step-sequencer/blob/master/assets/js/eventdispatcher.js
     // TODO: TBD: priority queue of callbacks might be an interesting feature to provide here...
     // TODO: TBD: could support some sort of logging to console here as well I suppose, but not right now...
-    this.__subscriptions = [];
+    ctrl.__subscriptions = [];
 
     /**
      * Subscribes One Callback for the specified event E.
@@ -12,7 +15,7 @@ var EventDispatcher = function() {
      */
     this.subscribeOne = function(e, callback) {
 
-        var subscriptions = this.__dispatcher.__subscriptions;
+        var subscriptions = ctrl.__subscriptions;
 
         // TODO: TBD: typeof subscribed === "undefined", or this...
         var subscribers = subscriptions[e] || (subscriptions[e] = []);
@@ -32,7 +35,7 @@ var EventDispatcher = function() {
 
         for (e in hashed) {
             if (hashed.hasOwnProperty(e)) {
-                this.subscribeOne(e, hashed[e]);
+                ctrl.subscribeOne(e, hashed[e]);
             }
         }
 
@@ -47,14 +50,14 @@ var EventDispatcher = function() {
     this.subscribe = function(eOrHashed, callback) {
 
         if (eOrHashed instanceof Object) {
-            return this.subscribeHashed(eOrHashed);
+            return ctrl.subscribeHashed(eOrHashed);
         }
 
         if (eOrHashed instanceof String) {
-            return this.subscribeOne(eOrHashed, callback);
+            return ctrl.subscribeOne(eOrHashed, callback);
         }
 
-        return this;
+        return ctrl;
     };
 
     /**
@@ -64,7 +67,7 @@ var EventDispatcher = function() {
      */
     this.unsubscribe = function(e, existingCallback) {
 
-        var subscriptions = this.__dispatcher.__subscriptions;
+        var subscriptions = ctrl.__subscriptions;
 
         var subscribers = subscriptions[e] || [];
 
@@ -79,7 +82,7 @@ var EventDispatcher = function() {
             delete subscriptions[e];
         }
 
-        return this;
+        return ctrl;
     };
 
     /**
@@ -88,13 +91,13 @@ var EventDispatcher = function() {
      */
     this.unsubscribeAll = function(e) {
 
-        var subscriptions = this.__dispatcher.__subscriptions[e];
+        var subscriptions = ctrl.__subscriptions[e];
 
         if (subscriptions[e] !== undefined) {
             delete subscriptions[e];
         }
 
-        return this;
+        return ctrl;
     };
 
     /**
