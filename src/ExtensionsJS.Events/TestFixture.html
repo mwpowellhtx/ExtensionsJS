@@ -1,0 +1,101 @@
+﻿<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title>Test Fixture</title>
+    <script type="text/javascript" src="Scripts/ExtensionsJS/events.js"></script>
+    <script type="text/javascript">
+
+        function printResult(result) {
+            document.write(JSON.stringify(result));
+            document.write("<br/>");
+        }
+
+        function passOrFail(result) {
+            return result ? "PASSED" : "FAILED";
+        }
+
+        function verifyEventSubscription(args, verify) {
+            printResult({
+                args: args,
+                verified: passOrFail(verify(args))
+            });
+        }
+
+        function verifyEventState(target, state, verify) {
+            printResult({
+                state: state,
+                dispatcher: passOrFail(verify(target.__dispatcher)),
+                subscribeOne: passOrFail(verify(target.subscribeOne)),
+                subscribeHashed: passOrFail(verify(target.subscribeHashed)),
+                subscribe: passOrFail(verify(target.subscribe)),
+                unsubscribe: passOrFail(verify(target.unsubscribe)),
+                unsubscribeAll: passOrFail(verify(target.unsubscribeAll)),
+                publish: passOrFail(verify(target.publish))
+            });
+        }
+
+        var HappeningController = function() {
+            this.setupEventDispatcher();
+
+            verifyEventState(this,
+                "setup",
+                function(x) {
+                    // We could get more detailed from "Function" perhaps, but this will do for now.
+                    return x instanceof EventDispatcher || x instanceof Function;
+                });
+
+            this.something = function() {
+
+                this.publish("happening", { name: "Happening", message: "Something is about to happen." });
+
+                // Do something...
+
+                this.publish("happened", { name: "Happened", message: "Something just happened." });
+
+                return this;
+            };
+        };
+
+        if (HappeningController.instance === undefined) {
+            HappeningController.instance = new HappeningController();
+        }
+
+    </script>
+</head>
+<body>
+
+    <!-- none of this is server side, it is all client side -->
+    <script type="text/javascript">
+
+        var ctrl = HappeningController.instance;
+
+        ctrl.subscribe({
+            happening: function(sender, args) {
+                verifyEventSubscription(args,
+                    function(x) {
+                        return x.name === "Happening" && x.message === "Something is about to happen.";
+                    });
+            },
+            happened: function(sender, args) {
+                verifyEventSubscription(args,
+                    function(x) {
+                        return x.name === "Happened" && x.message === "Something just happened.";
+                    });
+            }
+        });
+
+        ctrl.something();
+
+        ctrl.teardownEventDispatcher();
+
+        verifyEventState(this,
+            "teardown",
+            function(x) {
+                // Should all be undefined following teardown.
+                return x === undefined;
+            });
+
+    </script>
+
+</body>
+</html>

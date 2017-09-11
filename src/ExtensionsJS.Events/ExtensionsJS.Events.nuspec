@@ -1,0 +1,20 @@
+<?xml version='1.0'?>
+<package xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <metadata xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+        <id>ExtensionsJS.Events</id>
+        <title>ExtensionsJS.Events</title>
+        <version>1.0.0</version>
+        <authors>Michael W. Powell</authors>
+        <owners>mwpowellhtx</owners>
+        <licenseUrl>http://github.com/mwpowellhtx/ExtensionsJS.Events/raw/master/LICENSE.txt</licenseUrl>
+        <projectUrl>http://github.com/mwpowellhtx/ExtensionsJS.Events</projectUrl>
+        <requireLicenseAcceptance>false</requireLicenseAcceptance>
+        <description>Provides a useful set of Event Dispatching extensions facilitating Event Driven operation that is completely agnostic of any client side frameworks, jQuery, and so on.</description>
+        <tags>JavaScript events event driven callback subscribe one hashed unsubscribe all publish agnostic</tags>
+        <language>en-US</language>
+    </metadata>
+    <files>
+        <file src="bin\Scripts\ExtensionsJS\events.js" target="Content\Scripts\ExtensionsJS\events-1.0.0.js" />
+        <file src="bin\Tools\*.ps1" target="tools" />
+    </files>
+</package>
