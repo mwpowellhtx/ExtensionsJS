@@ -166,28 +166,4 @@ if (EventDispatcher.teardown === undefined) {
     }
 }
 
-if (Object.setupTypeEventDispatcher === undefined) {
-    Object.setupTypeEventDispatcher = function() {
-        EventDispatcher.setup(this);
-    }
-}
-
-if (Object.prototype.setupEventDispatcher === undefined) {
-    // ReSharper disable once NativeTypePrototypeExtending
-    Object.prototype.setupEventDispatcher = function() {
-        EventDispatcher.setup(this);
-    }
-}
-
-if (Object.teardownTypeEventDispatcher === undefined) {
-    Object.teardownTypeEventDispatcher = function() {
-        EventDispatcher.teardown(this);
-    }
-}
-
-if (Object.prototype.teardownEventDispatcher === undefined) {
-    // ReSharper disable once NativeTypePrototypeExtending
-    Object.prototype.teardownEventDispatcher = function() {
-        EventDispatcher.teardown(this);
-    }
-}
+/* Extending the Object Prototype is likely causing problems, so will back off of that much for the time being. */
