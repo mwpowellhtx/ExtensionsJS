@@ -108,7 +108,7 @@ var EventDispatcher = function() {
      */
     this.publish = function(e, args, context) {
 
-        var subscriptions = this.__dispatcher.__subscriptions;
+        var subscriptions = ctrl.__subscriptions;
 
         // TODO: TBD: may want to incorporate some sort of logging throughout here...
         var subscribers = subscriptions[e] || [];
