@@ -1,4 +1,6 @@
-var EventDispatcher = function() {
+var EventDispatcher = function(target) {
+
+    this.__target = target;
 
     var ctrl = this;
 
@@ -125,8 +127,8 @@ var EventDispatcher = function() {
 
             var sender, i;
 
-            // TODO: TBD: assume this is a sane context, or use the context argument?
-            for (sender = this, i = 0; i < length; i++) {
+            // Technically, the Target we were given *IS* the Sender.
+            for (sender = ctrl.__target, i = 0; i < length; i++) {
                 // TODO: TBD: no need to apply anything here? just call it? but for perhaps "this" confusion...
                 subscribers[i].callback(sender, args);
             }
@@ -142,7 +144,7 @@ if (EventDispatcher.setup === undefined) {
      * @param {any} target A Target on which to setup an Event Dispatcher.
      */
     EventDispatcher.setup = function(target) {
-        var dispatcher = new EventDispatcher();
+        var dispatcher = new EventDispatcher(target);
         target.__dispatcher = dispatcher;
         target.subscribeOne = dispatcher.subscribeOne;
         target.subscribeHashed = dispatcher.subscribeHashed;
