@@ -3,7 +3,7 @@
     <metadata xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
         <id>ExtensionsJS.Events</id>
         <title>ExtensionsJS.Events</title>
-        <version>1.1.1</version>
+        <version>1.1.2</version>
         <authors>Michael W. Powell</authors>
         <owners>mwpowellhtx</owners>
         <licenseUrl>http://github.com/mwpowellhtx/ExtensionsJS.Events/raw/master/LICENSE.txt</licenseUrl>
@@ -14,7 +14,7 @@
         <language>en-US</language>
     </metadata>
     <files>
-        <file src="bin\Scripts\ExtensionsJS\events.js" target="Content\Scripts\ExtensionsJS\events-1.1.1.js" />
+        <file src="bin\Scripts\ExtensionsJS\events.js" target="Content\Scripts\ExtensionsJS\events-1.1.2.js" />
         <file src="bin\Tools\*.ps1" target="tools" />
     </files>
 </package>
