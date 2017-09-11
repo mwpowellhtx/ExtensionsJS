@@ -1,9 +1,12 @@
 var EventDispatcher = function() {
+
+    var ctrl = this;
+
     // TODO: TBD: loosely inspired by the article: http://michd.me/blog/event-driven-javascript-a-simple-event-dispatcher/
     // TODO: TBD: loosely inspired by the article: http://github.com/michd/step-sequencer/blob/master/assets/js/eventdispatcher.js
     // TODO: TBD: priority queue of callbacks might be an interesting feature to provide here...
     // TODO: TBD: could support some sort of logging to console here as well I suppose, but not right now...
-    this.__subscriptions = [];
+    ctrl.__subscriptions = [];
 
     /**
      * Subscribes One Callback for the specified event E.
@@ -12,7 +15,7 @@ var EventDispatcher = function() {
      */
     this.subscribeOne = function(e, callback) {
 
-        var subscriptions = this.__dispatcher.__subscriptions;
+        var subscriptions = ctrl.__subscriptions;
 
         // TODO: TBD: typeof subscribed === "undefined", or this...
         var subscribers = subscriptions[e] || (subscriptions[e] = []);
@@ -32,29 +35,39 @@ var EventDispatcher = function() {
 
         for (e in hashed) {
             if (hashed.hasOwnProperty(e)) {
-                this.subscribeOne(e, hashed[e]);
+                ctrl.subscribeOne(e, hashed[e]);
             }
         }
 
         return this;
     };
 
+    /**
+     * Subscribes to the Event or the Hashed events.
+     * @param {String || Object} eOrHashed The Event Name or a Hashed Callback Object
+     * @param {} callback Optional. The Callback when eOrHashed is the Event Name. Otherwise ignored.
+     */
     this.subscribe = function(eOrHashed, callback) {
 
         if (eOrHashed instanceof Object) {
-            return this.subscribeHashed(eOrHashed);
+            return ctrl.subscribeHashed(eOrHashed);
         }
 
         if (eOrHashed instanceof String) {
-            return this.subscribeOne(eOrHashed, callback);
+            return ctrl.subscribeOne(eOrHashed, callback);
         }
 
-        return this;
+        return ctrl;
     };
 
+    /**
+     * Unsubscribes from the Event
+     * @param {String} e An Event Name from which to unsubscribe
+     * @param {} existingCallback An existing Callback function
+     */
     this.unsubscribe = function(e, existingCallback) {
 
-        var subscriptions = this.__dispatcher.__subscriptions;
+        var subscriptions = ctrl.__subscriptions;
 
         var subscribers = subscriptions[e] || [];
 
@@ -69,23 +82,33 @@ var EventDispatcher = function() {
             delete subscriptions[e];
         }
 
-        return this;
+        return ctrl;
     };
 
+    /**
+     * Unsubscribes all of the Callbacks associated with the Event.
+     * @param {String} e An Event Name from which to Unsubscribe All Callbacks
+     */
     this.unsubscribeAll = function(e) {
 
-        var subscriptions = this.__dispatcher.__subscriptions[e];
+        var subscriptions = ctrl.__subscriptions[e];
 
         if (subscriptions[e] !== undefined) {
             delete subscriptions[e];
         }
 
-        return this;
+        return ctrl;
     };
 
+    /**
+     * Publishes the Args to the event associated with the Event Name.
+     * @param {String} e An Event Name
+     * @param {any} args The arguments to pass along to the Callbacks Subscribed to the Event
+     * @param {} context 
+     */
     this.publish = function(e, args, context) {
 
-        var subscriptions = this.__dispatcher.__subscriptions;
+        var subscriptions = ctrl.__subscriptions;
 
         // TODO: TBD: may want to incorporate some sort of logging throughout here...
         var subscribers = subscriptions[e] || [];
@@ -114,6 +137,10 @@ var EventDispatcher = function() {
 }
 
 if (EventDispatcher.setup === undefined) {
+    /**
+     * Sets up an Event Dispatcher associated with the Target.
+     * @param {any} target A Target on which to setup an Event Dispatcher.
+     */
     EventDispatcher.setup = function(target) {
         var dispatcher = new EventDispatcher();
         target.__dispatcher = dispatcher;
@@ -127,6 +154,10 @@ if (EventDispatcher.setup === undefined) {
 }
 
 if (EventDispatcher.teardown === undefined) {
+    /**
+     * Tears down the Event Dispatcher associated with the Target.
+     * @param {any} target A Target from which to tear down the Event Dispatcher.
+     */
     EventDispatcher.teardown = function(target) {
         delete target.publish;
         delete target.unsubscribeAll;
@@ -138,28 +169,4 @@ if (EventDispatcher.teardown === undefined) {
     }
 }
 
-if (Object.setupTypeEventDispatcher === undefined) {
-    Object.setupTypeEventDispatcher = function() {
-        EventDispatcher.setup(this);
-    }
-}
-
-if (Object.prototype.setupEventDispatcher === undefined) {
-    // ReSharper disable once NativeTypePrototypeExtending
-    Object.prototype.setupEventDispatcher = function() {
-        EventDispatcher.setup(this);
-    }
-}
-
-if (Object.teardownTypeEventDispatcher === undefined) {
-    Object.teardownTypeEventDispatcher = function() {
-        EventDispatcher.teardown(this);
-    }
-}
-
-if (Object.prototype.teardownEventDispatcher === undefined) {
-    // ReSharper disable once NativeTypePrototypeExtending
-    Object.prototype.teardownEventDispatcher = function() {
-        EventDispatcher.teardown(this);
-    }
-}
+/* Extending the Object Prototype is likely causing problems, so will back off of that much for the time being. */

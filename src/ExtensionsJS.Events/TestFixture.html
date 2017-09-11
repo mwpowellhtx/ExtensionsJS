@@ -35,7 +35,7 @@
         }
 
         var HappeningController = function() {
-            this.setupEventDispatcher();
+            EventDispatcher.setup(this);
 
             verifyEventState(this,
                 "setup",
@@ -86,7 +86,7 @@
 
         ctrl.something();
 
-        ctrl.teardownEventDispatcher();
+        EventDispatcher.teardown(ctrl);
 
         verifyEventState(this,
             "teardown",
