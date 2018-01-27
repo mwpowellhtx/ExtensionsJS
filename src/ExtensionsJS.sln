@@ -5,13 +5,6 @@ VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExtensionsJS.String", "ExtensionsJS.String\ExtensionsJS.String.csproj", "{31087401-DF7D-4220-995C-9335A9DAD9E6}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{98B6912B-FC0D-4AAC-BE2A-92B5035F5AB6}"
-	ProjectSection(SolutionItems) = preProject
-		.nuget\NuGet.Config = .nuget\NuGet.Config
-		.nuget\NuGet.exe = .nuget\NuGet.exe
-		.nuget\NuGet.targets = .nuget\NuGet.targets
-	EndProjectSection
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExtensionsJS.Object", "ExtensionsJS.Object\ExtensionsJS.Object.csproj", "{D3B7E1C6-FB22-4EE3-91D9-34ECED12C664}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExtensionsJS.Array", "ExtensionsJS.Array\ExtensionsJS.Array.csproj", "{33B0B519-45A9-4663-BC60-F7924A9F737D}"
