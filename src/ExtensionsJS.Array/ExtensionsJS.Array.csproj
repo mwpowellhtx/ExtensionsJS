@@ -43,9 +43,6 @@
     <Content Include="Scripts\ExtensionsJS\arr.js">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="TestFixture.html">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
     <None Include="spec\Scripts\ExtensionsJS\arrSpec.js">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
