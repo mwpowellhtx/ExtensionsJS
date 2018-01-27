@@ -31,7 +31,7 @@ gulp.task("clean",
     });
 
 gulp.task("minify",
-    function () {
+    function() {
         // More AWESOMENESS!
         return gulp.src(cfg.root + "/*.js")
             .pipe(minify({
@@ -45,7 +45,7 @@ gulp.task("minify",
     });
 
 gulp.task("pack",
-    ["minify"], 
+    ["minify"],
     function() {
         // What can I say? This is simply FANTASTIC!
         return gulp.src([
