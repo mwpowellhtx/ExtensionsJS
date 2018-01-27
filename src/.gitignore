@@ -1,0 +1,6 @@
+.vs/
+node_modules/
+
+package-lock.json
+jasmine.json
+junitresults.xml
