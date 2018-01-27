@@ -27,6 +27,9 @@
         "jasmine-reporters": "2.3.0"
     },
     "dependencies": {},
+    "scripts": {
+        "test": "node ./node_modules/mocha"
+    },
     "keywords": [
         "JavaScript",
         "Array",
