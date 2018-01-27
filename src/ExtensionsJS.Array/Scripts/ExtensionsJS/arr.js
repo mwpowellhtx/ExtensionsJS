@@ -1,5 +1,5 @@
 // ReSharper disable NativeTypePrototypeExtending
-if (Array.prototype.joinDelimited) {
+if (Array.prototype.joinDelimited === undefined) {
     Array.prototype.joinDelimited = function(delim) {
         if (delim === undefined || delim === null) {
             delim = "-";
@@ -10,22 +10,42 @@ if (Array.prototype.joinDelimited) {
 
 // ReSharper disable PossiblyUnassignedProperty
 if (Array.range === undefined) {
+    // define our own min and max functions
+    var max = function() {
+        var result = undefined;
+        for (var i = 0; i < arguments.length; i++) {
+            if (result === undefined || arguments[i] > result) {
+                result = arguments[i];
+            }
+        }
+        return result;
+    }
+    var min = function() {
+        var result = undefined;
+        for (var i = 0; i < arguments.length; i++) {
+            if (result === undefined || arguments[i] < result) {
+                result = arguments[i];
+            }
+        }
+        return result;
+    }
     Array.range = function(start, stop, step) {
         // TODO: TBD: does not work (yet) for elements such as characters; maybe that's a good thing, leave that conversion for another function...
-        var r = [], x = start;
+        var r = [], x;
         // stepping by any amount or 1 (default)
         var s = step || 1;
+        // make sure that the range is appropriate depending on the step
+        if (s < 0) {
+            x = max(start, stop);
+            stop = min(start, stop);
+        } else {
+            x = min(start, stop);
+            stop = max(start, stop);
+        }
         // adaptive range stepping upwards or downwards
-        if (x <= stop) {
-            while (x <= stop) {
-                r.push(x);
-                x += s;
-            }
-        } else if (x >= stop) {
-            while (x >= stop) {
-                r.push(x);
-                x -= s;
-            }
+        while ((s > 0 && x <= stop) || (s < 0 && x >= stop)) {
+            r.push(x);
+            x += s;
         }
         return r;
     }
@@ -63,6 +83,7 @@ if (Array.prototype.all === undefined) {
 if (Array.prototype.combineWith === undefined) {
     Array.prototype.combineWith = function() {
         var r = [];
+        // TODO: TBD: combine with elementary values? as well as array values?
         // ReSharper disable once PossiblyUnassignedProperty
         var arrs = [this].concat(Array.from(arguments));
         arrs.reduceRight(function(g, x, i) {
@@ -92,9 +113,9 @@ if (Array.prototype.each === undefined) {
 if (Array.prototype.equals === undefined) {
     // http://stackoverflow.com/questions/22395357/how-to-compare-two-arrays-are-equal-using-javascript-or-jquery
     // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/every
-    Array.prototype.equals = function(arr) {
-        return this.length === arr.length
-            && this.every(function(i, j) { return i === arr[j] });
+    Array.prototype.equals = function(other, pred) {
+        pred = pred || function(x, y) { return x === y; };
+        return Array.isArray(other) && this.length === other.length && this.every(function(x, j) { return pred(x, other[j]); });
     }
 }
 
@@ -146,21 +167,27 @@ if (Array.prototype.project === undefined) {
 
 if (Array.prototype.projectMany === undefined) {
     Array.prototype.projectMany = function(getter) {
-        // either apply the getter across the array or return itself
-        getter = getter || function(x) { return [x]; };
-        var projected = this.project(getter);
-        var concatenated = [];
-        for (var i = 0; i < this.length; i++) {
-            concatenated = concatenated.concat(projected[i]);
+        getter = getter || function(x) { return x; };
+        // flatten this Array first then apply the getter
+        var concatenate = function(a) {
+            // which handles an arbitrarily deep level of arrays
+            return a.reduce(function(b, x) {
+                    return b.concat(Array.isArray(x) ? concatenate(x) : x);
+                },
+                []);
+        };
+        var flattened = concatenate(this);
+        var r = [];
+        for (var i = 0; i < flattened.length; i++) {
+            r.push(getter(flattened[i]));
         }
-        /* return the concatenated result */
-        return concatenated;
+        return r;
     }
 }
 
 if (Array.prototype.sum === undefined) {
     Array.prototype.sum = function(getter) {
-        getter = getter || function(a) { return a; };
+        getter = getter || function(x) { return x; };
         var r = 0;
         //for (let a of this) {
         for (var i = 0; i < this.length; i++) {
