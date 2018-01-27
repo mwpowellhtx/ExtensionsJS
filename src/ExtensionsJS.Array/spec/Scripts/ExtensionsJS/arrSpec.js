@@ -14,6 +14,13 @@ the integration aspects, even with specific references. */
 /// <reference path="../../../node_modules/chai/chai.js"/>
 /// <reference path="../../../Scripts/ExtensionsJS/arr.js"/>
 
+/* Once you update the project NuGet dependencies and npm dependencies and devDependencies,
+then you should be able to run the unit tests accordingly. This may require a Visual Studio
+reset, at minimum, or restarting Visual Studio entirely. I do not know exactly why that is,
+except that perhaps some internal JavaScript environment must require a reboot. Otherwise,
+what you end up with are things like 'describe' and 'it' are undefined, which is unexpected,
+of course. */
+
 var expect = chai.expect;
 var assert = chai.assert;
 
