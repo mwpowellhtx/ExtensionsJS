@@ -49,9 +49,9 @@ gulp.task("pack",
     function() {
         // What can I say? This is simply FANTASTIC!
         return gulp.src([
-                cfg.root + "/*.js",
-                cfg.bin + "/*.min.js"
-            ])
+                    cfg.root + "/*.js",
+                    cfg.bin + "/*.min.js"
+                ])
             .pipe(tar(cfg.name + ".tar"))
             .pipe(gzip())
             .pipe(gulp.dest(cfg.bin + "/dist"));
@@ -62,6 +62,6 @@ gulp.task("test",
         var opts = {
             "executable": "C:/Dev/NuGet/packages/Chutzpah.4.3.6/tools/chutzpah.console.exe"
         };
-        return gulp.src(cfg.spec + "/*.js")
+        return gulp.src(cfg.spec + "/*.js", { read: false })
             .pipe(chutzpah(opts));
     });
