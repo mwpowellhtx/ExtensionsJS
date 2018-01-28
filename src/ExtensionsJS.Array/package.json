@@ -9,7 +9,7 @@
     },
     "license": "GPL-3.0",
     "files": [
-        "Scripts/ExtensionsJS/arr.js"
+        "./Scripts/ExtensionsJS/arr.js"
     ],
     "devDependencies": {
         "del": "3.0.0",

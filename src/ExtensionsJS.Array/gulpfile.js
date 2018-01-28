@@ -44,13 +44,16 @@ gulp.task("minify",
             .pipe(gulp.dest(cfg.bin));
     });
 
+/* TODO: TBD: of course, this is somewhat of a work in progress; what else do I need
+to include? a README.md? organize a bit differently with its own bin folder? etc? */
 gulp.task("pack",
     ["minify"],
     function() {
         // What can I say? This is simply FANTASTIC!
         return gulp.src([
                     cfg.root + "/*.js",
-                    cfg.bin + "/*.min.js"
+                    cfg.bin + "/*.min.js",
+                    cfg.bin + "/package.json"
                 ])
             .pipe(tar(cfg.name + ".tar"))
             .pipe(gzip())
