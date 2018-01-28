@@ -1,0 +1,38 @@
+{
+    "name": "extensionsjs-boolean",
+    "description": "Provides useful prototype methods extending Boolean functionality.",
+    "version": "1.0.1",
+    "author": "Michael W Powell",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/mwpowellhtx/ExtensionsJS.git"
+    },
+    "license": "GPL-3.0",
+    "files": [
+        "./Scripts/ExtensionsJS/boolean.js"
+    ],
+    "devDependencies": {
+        "del": "3.0.0",
+        "gulp": "3.9.1",
+        "gulp-gzip": "1.4.2",
+        "gulp-minify": "2.1.0",
+        "gulp-tar": "2.1.0",
+        "tar-pack": "3.4.1",
+        "mocha": "5.0.0",
+        "chai": "4.1.2",
+        "jasmine": "2.9.0",
+        "gulp-mocha": "5.0.0",
+        "gulp-chutzpah": "1.3.0",
+        "gulp-jasmine": "3.0.0",
+        "jasmine-reporters": "2.3.0"
+    },
+    "dependencies": {},
+    "scripts": {
+        "test": "node ./node_modules/mocha"
+    },
+    "keywords": [
+        "JavaScript",
+        "Boolean",
+        "parse"
+    ]
+}
