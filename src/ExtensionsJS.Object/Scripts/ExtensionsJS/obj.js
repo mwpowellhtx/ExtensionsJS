@@ -1,3 +1,5 @@
+// TODO: TBD: I'm not sure that extending on Object is such a good idea at this time...
+
 if (Object.prototype.reduceArgs === undefined) {
     /* ReSharper disable once NativeTypePrototypeExtending */
     Object.prototype.reduceArgs = function(callback, initialValue) {
