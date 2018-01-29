@@ -49,9 +49,7 @@
     <None Include="package.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <Content Include="spec\Scripts\ExtensionsJS\booleanSpec.js">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
+    <None Include="spec\Scripts\ExtensionsJS\booleanSpec.js" />
     <Content Include="Web.config" />
   </ItemGroup>
   <ItemGroup>
