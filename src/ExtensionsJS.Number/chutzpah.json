@@ -3,6 +3,6 @@
     "MochaInterface": "bdd",
     "References": [
         { "Path": "./node_modules/chai/chai.js" },
-        { "Path": "./Scripts/ExtensionsJS/number.js" }
+        { "Path": "./Scripts/ExtensionsJS/str.js" }
     ]
 }
