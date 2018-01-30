@@ -144,14 +144,14 @@ if (EventDispatcher.setup === undefined) {
      * @param {any} target A Target on which to setup an Event Dispatcher.
      */
     EventDispatcher.setup = function(target) {
-        var dispatcher = new EventDispatcher(target);
-        target.__dispatcher = dispatcher;
-        target.subscribeOne = dispatcher.subscribeOne;
-        target.subscribeHashed = dispatcher.subscribeHashed;
-        target.subscribe = dispatcher.subscribe;
-        target.unsubscribe = dispatcher.unsubscribe;
-        target.unsubscribeAll = dispatcher.unsubscribeAll;
-        target.publish = dispatcher.publish;
+        var d = new EventDispatcher(target);
+        target.__dispatcher = d;
+        target.subscribeOne = d.subscribeOne;
+        target.subscribeHashed = d.subscribeHashed;
+        target.subscribe = d.subscribe;
+        target.unsubscribe = d.unsubscribe;
+        target.unsubscribeAll = d.unsubscribeAll;
+        target.publish = d.publish;
     }
 }
 
