@@ -8,145 +8,440 @@ var assert = chai.assert;
 describe("Perform Events ExtensionsJS unit testing",
     function() {
 
-        it("EventDispatcher setup static function is defined",
+        var target;
+
+        var defaultCallback = function(sender) {
+            // Target should be defined by this point.
+            // ReSharper disable once WrongExpressionStatement, PossiblyUnassignedProperty
+            expect(target).not.be.undefined;
+            // And Sender should be the Same as Target.
+            // ReSharper disable once PossiblyUnassignedProperty
+            expect(sender).to
+                // ReSharper disable once PossiblyUnassignedProperty
+                .equal(target);
+        };
+
+        var opts = {
+            anything: "anything",
+            something: "something",
+            // Anything: Happening?
+            happening: defaultCallback,
+            // Something: Happened!
+            happened: defaultCallback,
+            // Something: Happened!
+            again: defaultCallback
+        };
+
+        describe("Vet that EventDispatcher is available and correct",
             function() {
-                expect(EventDispatcher.setup).not.to.equal(undefined);
+
+                it("EventDispatcher is defined properly",
+                    function() {
+                        // ReSharper disable once PossiblyUnassignedProperty
+                        expect(EventDispatcher).to
+                            // ReSharper disable once PossiblyUnassignedProperty
+                            .be.a("function");
+                    });
+
+                it("EventDispatcher setup static function is defined",
+                    function() {
+                        // ReSharper disable once PossiblyUnassignedProperty
+                        expect(EventDispatcher.setup).not.to.equal(undefined);
+                    });
+
+                it("EventDispatcher teardown static function is defined",
+                    function() {
+                        // ReSharper disable once PossiblyUnassignedProperty
+                        expect(EventDispatcher.teardown).not.to.equal(undefined);
+                    });
             });
 
-        it("EventDispatcher teardown static function is defined",
+        describe("Further vet that EventDispatcher.prototype functions are also available",
             function() {
-                expect(EventDispatcher.teardown).not.to.equal(undefined);
+
+                var x, d;
+
+                beforeEach(function() {
+                    x = {};
+                    EventDispatcher.setup(x);
+                    // ReSharper disable once WrongExpressionStatement, PossiblyUnassignedProperty
+                    expect(d = x.__dispatcher).to.not
+                        // ReSharper disable once PossiblyUnassignedProperty
+                        .be.undefined;
+                });
+
+                afterEach(function() {
+                    d = undefined;
+                    EventDispatcher.teardown(x);
+                    // ReSharper disable once WrongExpressionStatement, PossiblyUnassignedProperty
+                    expect(x.__dispatcher).to
+                        // ReSharper disable once PossiblyUnassignedProperty
+                        .be.undefined;
+                });
+
+                it("Perform the vetting",
+                    function() {
+                        // ReSharper disable once PossiblyUnassignedProperty
+                        expect(d.subscribeOne).to
+                            // ReSharper disable once PossiblyUnassignedProperty
+                            .be.a("function");
+                        // ReSharper disable once PossiblyUnassignedProperty
+                        expect(d.subscribeHashed).to
+                            // ReSharper disable once PossiblyUnassignedProperty
+                            .be.a("function");
+                        // ReSharper disable once PossiblyUnassignedProperty
+                        expect(d.subscribe).to
+                            // ReSharper disable once PossiblyUnassignedProperty
+                            .be.a("function");
+                        // ReSharper disable once PossiblyUnassignedProperty
+                        expect(d.unsubscribe).to
+                            // ReSharper disable once PossiblyUnassignedProperty
+                            .be.a("function");
+                        // ReSharper disable once PossiblyUnassignedProperty
+                        expect(d.unsubscribeAll).to
+                            // ReSharper disable once PossiblyUnassignedProperty
+                            .be.a("function");
+                        // ReSharper disable once PossiblyUnassignedProperty
+                        expect(d.publish).to
+                            // ReSharper disable once PossiblyUnassignedProperty
+                            .be.a("function");
+                        // ReSharper disable once PossiblyUnassignedProperty
+                        expect(d.__subscriptions).to
+                            // ReSharper disable once PossiblyUnassignedProperty
+                            .be.a("array");
+                        // ReSharper disable once PossiblyUnassignedProperty
+                        expect(d.__target).to
+                            // ReSharper disable once PossiblyUnassignedProperty
+                            .be.a("object")
+                            // ReSharper disable once PossiblyUnassignedProperty
+                            .and.to.equal(x);
+                        // ReSharper disable once PossiblyUnassignedProperty
+                        expect(d.__findSubscription).to
+                            // ReSharper disable once PossiblyUnassignedProperty
+                            .be.a("function");
+                    });
             });
 
-        var target = {};
-
-        var verifyTarget = function(obj, verify) {
-            var o = obj;
-            verify(o.__dispatcher,
-                o.publish,
-                o.unsubscribeAll,
-                o.unsubscribe,
-                o.subscribe,
-                o.subscribeHashed,
-                o.subscribeOne
-            );
-        };
-
-        var hasHandlers = function(dispatcher) {
-            expect(dispatcher).not.to.be.undefined.and.to.be.a("EventDispatcher");
-            // expecting six handlers in all, arguments less the dispatcher
-            expect(arguments).to.have.lengthOf(7);
-            for (var i = 1; i < arguments.length; i++) {
-            // ReSharper disable once WrongExpressionStatement
-                expect(arguments[i]).not.to.be.undefined;
-            }
-        };
-
-        /* While we do not recommend drilling into the Dispatcher like this in a production
-        setting, taking the ExtensionsJS.Events dependency, this is sufficient for unit
-        testing verification along the way. */
-        var verifyDispatcherHasSubscriptions = function(obj) {
-            var d = obj.__dispatcher;
-            // ReSharper disable once WrongExpressionStatement
-            expect(d).not.to.be.undefined;
-            var s = d.__subscriptions;
-            // ReSharper disable once WrongExpressionStatement
-            expect(s).not.to.be.undefined;
-            expect(arguments).to.have.lengthOf.at.least(2);
-            for (var i = 1; i < arguments.length; i++) {
-                var key = arguments[i].key;
-                var callback = arguments[i].callback;
-                // ReSharper disable once WrongExpressionStatement
-                expect(s).to.have.any.keys(key);
-                // we must deep include in this instance for it to work
-                expect(s[key]).to.be.an("array").that.deep.includes({ callback: callback });
-            }
-        };
-
-        describe("set up the target",
+        describe("Perform routine subscriptions",
             function() {
 
-                EventDispatcher.setup(target);
-                verifyTarget(target, hasHandlers);
-
-                var something = "something";
-
-                var happened = function(sender) {
-                    expect(sender).to.be.same(target);
+                var makeTarget = function() {
+                    var x = {};
+                    // ReSharper disable once WrongExpressionStatement, PossiblyUnassignedProperty
+                    expect(x).not.to
+                        // ReSharper disable once PossiblyUnassignedProperty
+                        .be.undefined;
+                    return x;
                 };
 
-                describe("Subscribe with One callback",
+                var verifyTarget = function(t, verify) {
+                    verify(t.__dispatcher,
+                        t.publish,
+                        t.unsubscribeAll,
+                        t.unsubscribe,
+                        t.subscribe,
+                        t.subscribeHashed,
+                        t.subscribeOne
+                    );
+                };
+
+                beforeEach(function() {
+
+                    var hasHandlers = function(dispatcher) {
+                        // ReSharper disable once PossiblyUnassignedProperty
+                        expect(dispatcher).not.to
+                            // ReSharper disable once PossiblyUnassignedProperty
+                            .be.undefined
+                            // ReSharper disable once PossiblyUnassignedProperty
+                            .and.to
+                            // ReSharper disable once PossiblyUnassignedProperty
+                            .be.a("EventDispatcher");
+                        // expecting six handlers in all, arguments less the dispatcher
+                        // ReSharper disable once PossiblyUnassignedProperty
+                        expect(arguments).to
+                            // ReSharper disable once PossiblyUnassignedProperty
+                            .have.lengthOf(7);
+                        for (var i = 1; i < arguments.length; i++) {
+                            // ReSharper disable once WrongExpressionStatement, PossiblyUnassignedProperty
+                            expect(arguments[i]).not.to
+                                // ReSharper disable once PossiblyUnassignedProperty
+                                .be.undefined;
+                        }
+                    };
+
+                    // ReSharper disable once WrongExpressionStatement
+                    EventDispatcher.setup(target = makeTarget());
+
+                    verifyTarget(target, hasHandlers);
+                });
+
+                afterEach(function() {
+
+                    var doesNotHaveHandlers = function(dispatcher) {
+                        // ReSharper disable once WrongExpressionStatement, PossiblyUnassignedProperty
+                        expect(dispatcher).to
+                            // ReSharper disable once PossiblyUnassignedProperty
+                            .be.undefined;
+                        // expecting six handlers in all, arguments less the dispatcher
+                        // ReSharper disable once PossiblyUnassignedProperty
+                        expect(arguments).to
+                            // ReSharper disable once PossiblyUnassignedProperty
+                            .have.lengthOf(7);
+                        for (var i = 1; i < arguments.length; i++) {
+                            // ReSharper disable once WrongExpressionStatement, PossiblyUnassignedProperty
+                            expect(arguments[i]).to
+                                // ReSharper disable once PossiblyUnassignedProperty
+                                .be.undefined;
+                        }
+                    };
+
+                    // ReSharper disable once WrongExpressionStatement
+                    EventDispatcher.teardown(target);
+
+                    verifyTarget(target, doesNotHaveHandlers);
+                });
+
+                var makeHashed = function(init) {
+                    init = init || function(x) { return x; };
+                    return init({});
+                };
+
+                var getDispatcher = function(x) {
+                    var d = x.__dispatcher;
+                    // ReSharper disable once WrongExpressionStatement, PossiblyUnassignedProperty
+                    expect(d).not.to
+                        // ReSharper disable once PossiblyUnassignedProperty
+                        .be.undefined;
+                    return d;
+                };
+
+                var getSubscriptions = function(x) {
+                    var subs = getDispatcher(x).__subscriptions;
+                    // ReSharper disable once PossiblyUnassignedProperty
+                    expect(subs).to
+                        // ReSharper disable once PossiblyUnassignedProperty
+                        .be.a("array");
+                    return subs;
+                };
+
+                var verifySubscriptionCount = function(x, e, expectedCount) {
+                    var d = getDispatcher(x);
+                    if (e) { // given an event...
+                        var sub = d.__findSubscription(e);
+                        // similar as with other instance checks...
+                        if (expectedCount instanceof Number || typeof expectedCount === "number") {
+                            // ReSharper disable once WrongExpressionStatement, PossiblyUnassignedProperty
+                            expect(sub).not.to
+                                // ReSharper disable once PossiblyUnassignedProperty
+                                .be.undefined;
+                            // ReSharper disable once PossiblyUnassignedProperty
+                            expect(sub).to
+                                // ReSharper disable once PossiblyUnassignedProperty
+                                .have.lengthOf(expectedCount);
+                        } else {
+                            // ReSharper disable once WrongExpressionStatement, PossiblyUnassignedProperty
+                            expect(sub).to
+                                // ReSharper disable once PossiblyUnassignedProperty
+                                .be.undefined;
+                        }
+                    } else {
+                        // ReSharper disable once WrongExpressionStatement, PossiblyUnassignedProperty
+                        expect(d.__subscriptions).to
+                            // ReSharper disable once PossiblyUnassignedProperty
+                            .be.a("array")
+                            // ReSharper disable once PossiblyUnassignedProperty
+                            .and.to
+                            // ReSharper disable once PossiblyUnassignedProperty
+                            .be.empty;
+                    }
+                }
+
+
+                describe("Target can receive subscriptions",
                     function() {
 
-                        var hashed = { something: happened };
-
-                        it("subscribe one to something happened",
+                        it("EventDispatcher.prototype.subscribeOne works",
                             function() {
-
-                                target.subscribeOne(something, happened);
-
-                                /* this is a little bit deeper dive into the behind the scenes stuff
-                                than I'd like at this level. */
-                                expect(Object.keys(target.__dispatcher.__subscriptions)).to.have.lengthOf(1);
-
-                                verifyDispatcherHasSubscriptions(target, { key: something, callback: happened });
+                                target.subscribeOne(opts.something, opts.happened);
+                                verifySubscriptionCount(target, opts.something, 1);
                             });
 
-
-                        it("subscribe to something happened",
+                        it("EventDispatcher.prototype.subscribe works",
                             function() {
-
-                                target.subscribe(something, happened);
-
-                                // ditto above, but it illustrates the functionaliy is working
-                                expect(Object.keys(target.__dispatcher.__subscriptions)).to.have.lengthOf(1);
-
-                                verifyDispatcherHasSubscriptions(target, { key: something, callback: happened });
+                                target.subscribe(opts.something, opts.happened);
+                                verifySubscriptionCount(target, opts.something, 1);
                             });
 
-                        it("subscribe one to hashed something happened",
-                            function() {
+                        var hashed = makeHashed(x => {
+                            x[opts.something] = opts.happened;
+                            return x;
+                        });
 
+                        it("EventDispatcher.prototype.subscribeHashed works",
+                            function() {
                                 target.subscribeHashed(hashed);
-
-                                // ditto above, but it illustrates the functionaliy is working
-                                expect(Object.keys(target.__dispatcher.__subscriptions)).to.have.lengthOf(1);
-
-                                verifyDispatcherHasSubscriptions(target, { key: something, callback: happened });
+                                verifySubscriptionCount(target, opts.something, 1);
                             });
 
-                        it("subscribe to hashed something happened",
+                        it("EventDispatcher.prototype.subscribe hashed works",
                             function() {
-
                                 target.subscribe(hashed);
-
-                                // ditto above, but it illustrates the functionaliy is working
-                                expect(Object.keys(target.__dispatcher.__subscriptions)).to.have.lengthOf(1);
-
-                                verifyDispatcherHasSubscriptions(target, { key: something, callback: happened });
+                                verifySubscriptionCount(target, opts.something, 1);
                             });
                     });
 
-                describe("tear down the target",
+                // emulation useful during unsubscription as well as publication...
+                var emulateSubscription = function(x, e) {
+                    var subs = getSubscriptions(x);
+                    var sub = [];
+                    for (var i = 2; i < arguments.length; i++) {
+                        sub.push(arguments[i]);
+                    }
+                    sub.__e = e;
+                    subs.push(sub);
+                };
+
+                describe("Subscriptions can be removed from target",
                     function() {
 
-                        var doesNotHaveHandlers = function(dispatcher) {
-                            // ReSharper disable once WrongExpressionStatement
-                            expect(dispatcher).to.be.undefined;
-                            // expecting six handlers in all, arguments less the dispatcher
-                            expect(arguments).to.have.lengthOf(7);
-                            for (var i = 1; i < arguments.length; i++) {
-                            // ReSharper disable once WrongExpressionStatement
-                                expect(arguments[i]).to.be.undefined;
-                            }
+                        /* We do not need to full-on subscribe via the API. We just need to emulate
+                        that subscriptions in fact exist. By that we just need to build up the data. */
+                        beforeEach(function() {
+                            emulateSubscription(target, opts.something, opts.happened, opts.again);
+                        });
+
+                        it("Unsubscribe from something happened",
+                            function() {
+                                target.unsubscribe(opts.something, opts.happened);
+                                verifySubscriptionCount(target, opts.something, 1);
+                            });
+
+                        it("Unsubscribe from all",
+                            function() {
+                                target.unsubscribeAll(opts.something);
+                                verifySubscriptionCount(target, opts.something);
+                                // in fact, vet broader than the single event request...
+                                verifySubscriptionCount(target);
+                            });
+                    });
+
+                describe("Event publications work as expected",
+                    function() {
+
+                        var count;
+
+                        var verifyCount = function(expectedCount) {
+                            // ReSharper disable once PossiblyUnassignedProperty
+                            expect(expectedCount).to.equal(count);
                         };
 
-                        it("target can be torn down",
+                        describe("That event can be published",
                             function() {
-                                verifyTarget(target, hasHandlers);
-                                EventDispatcher.teardown(target);
-                                verifyTarget(target, doesNotHaveHandlers);
+
+                                beforeEach(function() {
+                                    count = 0;
+                                    emulateSubscription(target, opts.something, opts.happened, s => { ++count; });
+                                    verifyCount(0);
+                                });
+
+                                it("Perform the argument vetting",
+                                    function() {
+                                        target.publish(opts.something);
+                                        verifyCount(1);
+                                    });
                             });
+
+                        // ReSharper disable once InconsistentNaming
+                        var _1 = "abc",
+                            // ReSharper disable once InconsistentNaming
+                            _2 = 123;
+
+                        describe("That simple arguments are passed correctly",
+                            function() {
+
+                                beforeEach(function() {
+                                    count = 0;
+                                    emulateSubscription(target,
+                                        opts.something,
+                                        opts.happened,
+                                        (s, a, x) => {
+                                            ++count;
+                                            // ReSharper disable once PossiblyUnassignedProperty
+                                            expect(a).to.equal(_1);
+                                            // ReSharper disable once PossiblyUnassignedProperty
+                                            expect(x).to.equal(_2);
+                                        });
+                                    verifyCount(0);
+                                });
+
+                                it("Perform the argument vetting",
+                                    function() {
+                                        target.publish(opts.something, [_1, _2]);
+                                        verifyCount(1);
+                                    });
+                            });
+
+                        describe("That array enclosed object arguments are passed correctly",
+                            function() {
+
+                                beforeEach(function() {
+                                    count = 0;
+                                    emulateSubscription(target,
+                                        opts.something,
+                                        opts.happened,
+                                        (s, obj) => {
+                                            ++count;
+                                            // ReSharper disable once WrongExpressionStatement, PossiblyUnassignedProperty
+                                            expect(obj).to
+                                                // ReSharper disable once PossiblyUnassignedProperty
+                                                .be.a("object")
+                                                // ReSharper disable once PossiblyUnassignedProperty
+                                                .and.to
+                                                // ReSharper disable once PossiblyUnassignedProperty
+                                                .deep.equal({ a: _1, x: _2 });
+                                        });
+                                    verifyCount(0);
+                                });
+
+                                it("Perform the argument vetting",
+                                    function() {
+                                        // Which should be just another argument in the array of parameters.
+                                        target.publish(opts.something, [{ a: _1, x: _2 }]);
+                                        verifyCount(1);
+                                    });
+                            });
+
+                        describe("That simple object arguments are passed correctly",
+                            function() {
+
+                                beforeEach(function() {
+                                    count = 0;
+                                    emulateSubscription(target,
+                                        opts.something,
+                                        opts.happened,
+                                        (s, obj) => {
+                                            ++count;
+                                            // ReSharper disable once WrongExpressionStatement, PossiblyUnassignedProperty
+                                            expect(obj).to
+                                                // ReSharper disable once PossiblyUnassignedProperty
+                                                .be.a("object")
+                                                // ReSharper disable once PossiblyUnassignedProperty
+                                                .and.to
+                                                // ReSharper disable once PossiblyUnassignedProperty
+                                                .deep.equal({ a: _1, x: _2 });
+                                        });
+                                    verifyCount(0);
+                                });
+
+                                it("Perform the argument vetting",
+                                    function() {
+                                        // Arguments should be accepted without an array as well.
+                                        target.publish(opts.something, { a: _1, x: _2 });
+                                        verifyCount(1);
+                                    });
+                            });
+
+                        // TODO: TBD: I'm on the fence as to the efficacy of "context" ... is it really necessary, and how might it be different from the __target ... ?
                     });
             });
     });

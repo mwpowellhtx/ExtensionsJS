@@ -10,6 +10,45 @@ var EventDispatcher = function(target) {
     // TODO: TBD: could support some sort of logging to console here as well I suppose, but not right now...
     ctrl.__subscriptions = [];
 
+    this.__findSubscription = function(e) {
+        var subs = ctrl.__subscriptions;
+        /* really, really, really strange... so, this was not working and not working and
+        not working, until I added console logging (of any sort? i.e. WriteLine? log?),
+        then suddenly it started working. So ostensibly, plausibly, something was jarred
+        loose in the tooling JavaScript runtime? */
+        /* TODO: TBD: no, this may be a test scope issue after all... if I just run this test
+        it works. but if I run this in the context of a parent describe node, then things fall
+        apart. so perhaps I need to establish describe scopes that include these paths as well... */
+        var sub = undefined;
+        for (var i = 0; subs.length; i++) {
+            if (subs[i].__e === e) {
+                sub = subs[i];
+                break;
+            }
+        }
+        return sub;
+    }
+
+    var findOrCreateSubscription = function(ctrl, e) {
+
+        var subs = ctrl.__subscriptions;
+
+        // let's also leverage the scope of the Sub and the E...
+        var createSubscription = function(x) {
+            (x = x || []).__e = e;
+            return x;
+        };
+
+        var sub = ctrl.__findSubscription(e);
+
+        if (sub === undefined) {
+            sub = createSubscription(sub);
+            subs.push(sub);
+        }
+
+        return sub;
+    };
+
     /**
      * Subscribes One Callback for the specified event E.
      * @param {string} e 
@@ -17,14 +56,9 @@ var EventDispatcher = function(target) {
      */
     this.subscribeOne = function(e, callback) {
 
-        var subscriptions = ctrl.__subscriptions;
+        findOrCreateSubscription(ctrl, e).push(callback);
 
-        // TODO: TBD: typeof subscribed === "undefined", or this...
-        var subscribers = subscriptions[e] || (subscriptions[e] = []);
-
-        subscribers.push({ callback: callback });
-
-        return this;
+        return ctrl;
     };
 
     /**
@@ -33,15 +67,13 @@ var EventDispatcher = function(target) {
      */
     this.subscribeHashed = function(hashed) {
 
-        var e;
-
-        for (e in hashed) {
+        for (var e in hashed) {
             if (hashed.hasOwnProperty(e)) {
                 ctrl.subscribeOne(e, hashed[e]);
             }
         }
 
-        return this;
+        return ctrl;
     };
 
     /**
@@ -51,12 +83,13 @@ var EventDispatcher = function(target) {
      */
     this.subscribe = function(eOrHashed, callback) {
 
-        if (eOrHashed instanceof Object) {
-            return ctrl.subscribeHashed(eOrHashed);
+        // This is a little peculiar, but not especially considering JavaScript...
+        if ((eOrHashed instanceof String || typeof eOrHashed === "string") && callback instanceof Function) {
+            return ctrl.subscribeOne(eOrHashed, callback);
         }
 
-        if (eOrHashed instanceof String) {
-            return ctrl.subscribeOne(eOrHashed, callback);
+        if (eOrHashed instanceof Object && callback === undefined) {
+            return ctrl.subscribeHashed(eOrHashed);
         }
 
         return ctrl;
@@ -69,19 +102,22 @@ var EventDispatcher = function(target) {
      */
     this.unsubscribe = function(e, existingCallback) {
 
-        var subscriptions = ctrl.__subscriptions;
+        var sub = ctrl.__findSubscription(e);
 
-        var subscribers = subscriptions[e] || [];
+        var remove = function(a, x) {
+            var i;
+            if (a && (i = a.indexOf(x)) >= 0) {
+                a.splice(i, 1);
+            }
+        };
 
-        var i = subscribers.indexOf(existingCallback);
-
-        if (i >= 0) {
-            // Remove the callback from the subscribed callbacks.
-            subscribers.splice(i, 1);
-        }
-
-        if (subscribers.length === 0) {
-            delete subscriptions[e];
+        // Remove the Callback first, followed by the Subscriptions themselves if necessary.
+        if (sub !== undefined) {
+            remove(sub, existingCallback);
+            // ReSharper disable once QualifiedExpressionMaybeNull
+            if (!sub.length) {
+                remove(ctrl.__subscriptions, sub);
+            }
         }
 
         return ctrl;
@@ -93,10 +129,12 @@ var EventDispatcher = function(target) {
      */
     this.unsubscribeAll = function(e) {
 
-        var subscriptions = ctrl.__subscriptions[e];
+        var sub = ctrl.__findSubscription(e);
 
-        if (subscriptions[e] !== undefined) {
-            delete subscriptions[e];
+        if (sub) {
+            var subs = ctrl.__subscriptions;
+            var i = subs.indexOf(sub);
+            subs.splice(i, 1);
         }
 
         return ctrl;
@@ -105,36 +143,24 @@ var EventDispatcher = function(target) {
     /**
      * Publishes the Args to the event associated with the Event Name.
      * @param {String} e An Event Name
-     * @param {any} args The arguments to pass along to the Callbacks Subscribed to the Event
-     * @param {} context 
+     * @param {any} args An Array of arguments are passed to your callback as the values themselves whereas non-array arguments are passed as-is
+     * @param {Object} may be any Object which the caller wants to bind to the Callback
      */
     this.publish = function(e, args, context) {
-
-        var subscriptions = ctrl.__subscriptions;
-
-        // TODO: TBD: may want to incorporate some sort of logging throughout here...
-        var subscribers = subscriptions[e] || [];
-
-        //// TODO: TBD: why?
-        //args = args instanceof Array ? args : [args];
-
-        //// TODO: TBD: App? may or may not want that, per se...
-        //context = context || App;
-
-        var length = subscribers.length;
-
-        if (length > 0) {
-
-            var sender, i;
-
-            // Technically, the Target we were given *IS* the Sender.
-            for (sender = ctrl.__target, i = 0; i < length; i++) {
-                // TODO: TBD: no need to apply anything here? just call it? but for perhaps "this" confusion...
-                subscribers[i].callback(sender, args);
+        // TODO: TBD: I'm still not positive the value of 'context', if it isn't __target already...
+        var sub = ctrl.__findSubscription(e);
+        if (sub) {
+            // Believe it or not, Null is stronger than Undefined with JavaScript.
+            context = context || null;
+            for (var i = 0; i < sub.length; i++) {
+                var a = [ctrl.__target];
+                if (args) {
+                    a = a.concat(Array.isArray(args) ? args : [args]);
+                }
+                sub[i].apply(context, a);
             }
         }
-
-        return this;
+        return ctrl;
     }
 }
 

@@ -42,9 +42,6 @@
     <Content Include="gulpfile.js" />
     <Content Include="Scripts\ExtensionsJS\events.js" />
     <Content Include="spec\Scripts\ExtensiosJS\eventsSpec.js" />
-    <Content Include="TestFixture.html">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
     <Content Include="Web.config" />
   </ItemGroup>
   <ItemGroup>
