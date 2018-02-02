@@ -13,12 +13,12 @@ describe("Perform Events ExtensionsJS unit testing",
         var defaultCallback = function(sender) {
             // Target should be defined by this point.
             // ReSharper disable once WrongExpressionStatement, PossiblyUnassignedProperty
-            expect(target).not.be.undefined;
+            expect(target).not.to
+                // ReSharper disable once PossiblyUnassignedProperty
+                .be.undefined;
             // And Sender should be the Same as Target.
             // ReSharper disable once PossiblyUnassignedProperty
-            expect(sender).to
-                // ReSharper disable once PossiblyUnassignedProperty
-                .equal(target);
+            expect(sender).to.equal(target);
         };
 
         var opts = {
