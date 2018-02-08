@@ -10,11 +10,13 @@ describe("Perform Boolean ExtensionsJS unit testing",
 
         it("parse static function is defined",
             function() {
+                // ReSharper disable once PossiblyUnassignedProperty
                 expect(Boolean.parse).not.to.equal(undefined);
             });
 
         var verifyParse = function(s, expected) {
             var actual = Boolean.parse(s);
+            // ReSharper disable once PossiblyUnassignedProperty
             expect(actual).to.equal(expected);
         };
 
