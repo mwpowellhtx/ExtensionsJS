@@ -13,11 +13,13 @@ describe("Perform String ExtensionsJS unit testing",
 
                 it("Contains static function is defined",
                     function() {
+                        // ReSharper disable once PossiblyUnassignedProperty
                         expect(String.prototype.contains).not.to.equal(undefined);
                     });
 
                 var verifyStringContains = function(s, x, expected) {
                     var actual = s.contains(x);
+                    // ReSharper disable once PossiblyUnassignedProperty
                     expect(actual).to.equal(expected);
                 };
 
@@ -42,19 +44,28 @@ describe("Perform String ExtensionsJS unit testing",
 
                 it("JSON parse itslef is defined",
                     function() {
+                        // ReSharper disable once PossiblyUnassignedProperty
                         expect(JSON).to.not.equal(undefined);
+                        // ReSharper disable once PossiblyUnassignedProperty
                         expect(JSON.parse).to.not.equal(undefined);
                     });
 
                 it("fromJSON static function is defined",
                     function() {
+                        // ReSharper disable once PossiblyUnassignedProperty
                         expect(String.prototype.fromJSON).not.to.equal(undefined);
                     });
                 // ReSharper disable once InconsistentNaming
                 var verifyFromJSON = function(s, verify) {
                     var actual = s.fromJSON();
-                    expect(actual).to.be.a("object");
-                    expect(verify).to.be.a("function");
+                    // ReSharper disable once PossiblyUnassignedProperty
+                    expect(actual).to
+                        // ReSharper disable once PossiblyUnassignedProperty
+                        .be.a("object");
+                    // ReSharper disable once PossiblyUnassignedProperty
+                    expect(verify).to
+                        // ReSharper disable once PossiblyUnassignedProperty
+                        .be.a("function");
                     verify(actual);
                 };
 
@@ -65,13 +76,17 @@ describe("Perform String ExtensionsJS unit testing",
                             {
                                 s: '{ "x": 1 }',
                                 verify: function(obj) {
+                                    // ReSharper disable once PossiblyUnassignedProperty
                                     expect(obj.x).to.equal(1);
                                 }
                             },
                             {
                                 s: '{ "arr": [1, 2, 3] }',
                                 verify: function(obj) {
-                                    expect(obj.arr).to.deep.equal([1, 2, 3]);
+                                    // ReSharper disable once PossiblyUnassignedProperty
+                                    expect(obj.arr).to
+                                        // ReSharper disable once PossiblyUnassignedProperty
+                                        .deep.equal([1, 2, 3]);
                                 }
                             }
                         ];
