@@ -31,6 +31,7 @@ describe("Verify Array ExtensionsJS features",
 
         var expectExists = function() {
             for (var i = 0; i < arguments.length; i++) {
+                // ReSharper disable once PossiblyUnassignedProperty
                 expect(arguments[i]).not.to.equal(undefined);
             }
         }
@@ -52,28 +53,40 @@ describe("Verify Array ExtensionsJS features",
                     function() {
                         var actual = Array.range(1, 3);
                         var expected = [1, 2, 3];
-                        expect(actual).has.length(expected.length).to.deep.equal(expected);
+                        // ReSharper disable once PossiblyUnassignedProperty
+                        expect(actual).has.length(expected.length).to
+                            // ReSharper disable once PossiblyUnassignedProperty
+                            .deep.equal(expected);
                     });
 
                 it("range 1 to 3 step 2",
                     function() {
                         var actual = Array.range(1, 3, 2);
                         var expected = [1, 3];
-                        expect(actual).has.length(expected.length).to.deep.equal(expected);
+                        // ReSharper disable once PossiblyUnassignedProperty
+                        expect(actual).has.length(expected.length).to
+                            // ReSharper disable once PossiblyUnassignedProperty
+                            .deep.equal(expected);
                     });
 
                 it("range 1 to 4 step -1",
                     function() {
                         var actual = Array.range(1, 4, -1);
                         var expected = [4, 3, 2, 1];
-                        expect(actual).has.length(expected.length).to.deep.equal(expected);
+                        // ReSharper disable once PossiblyUnassignedProperty
+                        expect(actual).has.length(expected.length).to
+                            // ReSharper disable once PossiblyUnassignedProperty
+                            .deep.equal(expected);
                     });
 
                 it("range 4 to 1 step -2",
                     function() {
                         var actual = Array.range(4, 1, -2);
                         var expected = [4, 2];
-                        expect(actual).has.length(expected.length).to.deep.equal(expected);
+                        // ReSharper disable once PossiblyUnassignedProperty
+                        expect(actual).has.length(expected.length).to
+                            // ReSharper disable once PossiblyUnassignedProperty
+                            .deep.equal(expected);
                     });
             });
 
@@ -90,6 +103,7 @@ describe("Verify Array ExtensionsJS features",
                     var actual = opts.delim === undefined
                         ? opts.target.joinDelimited()
                         : opts.target.joinDelimited(opts.delim);
+                    // ReSharper disable once PossiblyUnassignedProperty
                     expect(actual).to.equal(opts.expected);
                 };
 
@@ -116,6 +130,7 @@ describe("Verify Array ExtensionsJS features",
                     function() {
                         // vet any with default predicate
                         var actual = values.any();
+                        // ReSharper disable once PossiblyUnassignedProperty
                         expect(actual).to.equal(true);
                     });
 
@@ -123,6 +138,7 @@ describe("Verify Array ExtensionsJS features",
                     function() {
                         // vet any with user provided predicate
                         var actual = values.any(function(x) { return x === 2; });
+                        // ReSharper disable once PossiblyUnassignedProperty
                         expect(actual).to.equal(true);
                     });
 
@@ -130,6 +146,7 @@ describe("Verify Array ExtensionsJS features",
                     function() {
                         // vet any with user provided predicate
                         var actual = values.any(function(x) { return x === 4; });
+                        // ReSharper disable once PossiblyUnassignedProperty
                         expect(actual).to.equal(false);
                     });
             });
@@ -145,12 +162,14 @@ describe("Verify Array ExtensionsJS features",
                 it("all values must do using default predicate",
                     function() {
                         var actual = values.all();
+                        // ReSharper disable once PossiblyUnassignedProperty
                         expect(actual).to.equal(true);
                     });
 
                 it("all non existing values must also do using default predicate",
                     function() {
                         var actual = [undefined, null, 0].all();
+                        // ReSharper disable once PossiblyUnassignedProperty
                         expect(actual).to.equal(false);
                     });
 
@@ -158,12 +177,14 @@ describe("Verify Array ExtensionsJS features",
                 it("all values must be greater than zero",
                     function() {
                         var actual = values.all(function(x) { return x > 0; });
+                        // ReSharper disable once PossiblyUnassignedProperty
                         expect(actual).to.equal(true);
                     });
 
                 it("no values were less than or equal zero",
                     function() {
                         var actual = values.all(function(x) { return x <= 0; });
+                        // ReSharper disable once PossiblyUnassignedProperty
                         expect(actual).to.equal(false);
                     });
             });
@@ -198,13 +219,19 @@ describe("Verify Array ExtensionsJS features",
                 it("verify simple visitation",
                     function() {
                         var r = [];
-                        expect(values).to.deep.equal([1, 2, 3]);
+                        // ReSharper disable once PossiblyUnassignedProperty
+                        expect(values).to
+                            // ReSharper disable once PossiblyUnassignedProperty
+                            .deep.equal([1, 2, 3]);
                         expect(r).has.length(0);
                         // square each of the values
                         values.each(function(x) {
                             r.push(square(x));
                         });
-                        expect(r).to.deep.equal([1, 4, 9]);
+                        // ReSharper disable once PossiblyUnassignedProperty
+                        expect(r).to
+                            // ReSharper disable once PossiblyUnassignedProperty
+                            .deep.equal([1, 4, 9]);
                     });
             });
 
@@ -219,6 +246,7 @@ describe("Verify Array ExtensionsJS features",
                 it("values equals [1, 2, 3] using default predicate",
                     function() {
                         var actual = values.equals([1, 2, 3]);
+                        // ReSharper disable once PossiblyUnassignedProperty
                         expect(actual).to.equal(true);
                     });
 
@@ -226,12 +254,14 @@ describe("Verify Array ExtensionsJS features",
                     function() {
                         var pred = function(x, y) { return x === y; };
                         var actual = values.equals([1, 2, 3], pred);
+                        // ReSharper disable once PossiblyUnassignedProperty
                         expect(actual).to.equal(true);
                     });
 
                 it("values does not equal [1, 2] using default predicate",
                     function() {
                         var actual = values.equals([1, 2]);
+                        // ReSharper disable once PossiblyUnassignedProperty
                         expect(actual).to.equal(false);
                     });
 
@@ -239,12 +269,14 @@ describe("Verify Array ExtensionsJS features",
                     function() {
                         var pred = function(x, y) { return x === y - 1; };
                         var actual = values.equals([1, 2, 3], pred);
+                        // ReSharper disable once PossiblyUnassignedProperty
                         expect(actual).to.equal(false);
                     });
 
                 it("values does not equal '123' using default predicate",
                     function() {
                         var actual = values.equals("123");
+                        // ReSharper disable once PossiblyUnassignedProperty
                         expect(actual).to.equal(false);
                     });
             });
@@ -260,6 +292,7 @@ describe("Verify Array ExtensionsJS features",
                 it("values [1, 2, 3] front equals 1",
                     function() {
                         var actual = values.front();
+                        // ReSharper disable once PossiblyUnassignedProperty
                         expect(actual).to.equal(1);
                     });
             });
@@ -275,6 +308,7 @@ describe("Verify Array ExtensionsJS features",
                 it("values [1, 2, 3] back equals 3",
                     function() {
                         var actual = values.back();
+                        // ReSharper disable once PossiblyUnassignedProperty
                         expect(actual).to.equal(3);
                     });
             });
@@ -290,7 +324,10 @@ describe("Verify Array ExtensionsJS features",
                 it("projection, of squares, in this case, works",
                     function() {
                         var actual = values.project(square);
-                        expect(actual).to.deep.equal([1, 4, 9]);
+                        // ReSharper disable once PossiblyUnassignedProperty
+                        expect(actual).to
+                            // ReSharper disable once PossiblyUnassignedProperty
+                            .deep.equal([1, 4, 9]);
                     });
             });
 
@@ -308,7 +345,10 @@ describe("Verify Array ExtensionsJS features",
                             [].concat(values),
                             [].concat(values)
                         ].projectMany(square);
-                        expect(actual).to.deep.equal([1, 4, 9, 1, 4, 9]);
+                        // ReSharper disable once PossiblyUnassignedProperty
+                        expect(actual).to
+                            // ReSharper disable once PossiblyUnassignedProperty
+                            .deep.equal([1, 4, 9, 1, 4, 9]);
                     });
             });
 
@@ -323,6 +363,7 @@ describe("Verify Array ExtensionsJS features",
                 it("values [1, 2, 3] sum equals 6",
                     function() {
                         var actual = values.sum();
+                        // ReSharper disable once PossiblyUnassignedProperty
                         expect(actual).to.equal(6);
                     });
             });
@@ -339,7 +380,10 @@ describe("Verify Array ExtensionsJS features",
                     function() {
                         var pred = function(x) { return x > 1; };
                         var actual = values.where(pred);
-                        expect(actual).to.deep.equal([2, 3]);
+                        // ReSharper disable once PossiblyUnassignedProperty
+                        expect(actual).to
+                            // ReSharper disable once PossiblyUnassignedProperty
+                            .deep.equal([2, 3]);
                     });
             });
 
@@ -354,6 +398,7 @@ describe("Verify Array ExtensionsJS features",
                 it("values [1, 2, 3] max equals 3",
                     function() {
                         var actual = values.max();
+                        // ReSharper disable once PossiblyUnassignedProperty
                         expect(actual).to.equal(3);
                     });
             });
@@ -369,6 +414,7 @@ describe("Verify Array ExtensionsJS features",
                 it("values [1, 2, 3] min equals 1",
                     function() {
                         var actual = values.min();
+                        // ReSharper disable once PossiblyUnassignedProperty
                         expect(actual).to.equal(1);
                     });
             });
