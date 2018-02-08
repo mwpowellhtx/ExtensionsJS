@@ -13,11 +13,13 @@ describe("Perform Number ExtensionsJS unit testing",
 
                 it("isNumeric static function is defined",
                     function() {
+                        // ReSharper disable once PossiblyUnassignedProperty
                         expect(Number.isNumeric).not.to.equal(undefined);
                     });
 
                 var verifyIsNumeric = function(x, expected) {
                     var actual = Number.isNumeric(x);
+                    // ReSharper disable once PossiblyUnassignedProperty
                     expect(actual).to.equal(expected);
                 };
 
@@ -52,11 +54,13 @@ describe("Perform Number ExtensionsJS unit testing",
 
                 it("toBoolean static function is defined",
                     function() {
+                        // ReSharper disable once PossiblyUnassignedProperty
                         expect(Number.toBoolean).not.to.equal(undefined);
                     });
 
                 var verifyToBoolean = function(x, expected) {
                     var actual = Number.toBoolean(x);
+                    // ReSharper disable once PossiblyUnassignedProperty
                     expect(actual).to.equal(expected);
                 };
 
