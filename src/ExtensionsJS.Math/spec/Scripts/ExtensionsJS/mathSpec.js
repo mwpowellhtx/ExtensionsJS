@@ -10,11 +10,13 @@ describe("Perform Math ExtensionsJS unit testing",
 
         it("limit static function is defined",
             function() {
+                // ReSharper disable once PossiblyUnassignedProperty
                 expect(Math.limit).not.to.equal(undefined);
             });
 
         var verifyLimit = function(x, min, max, expected) {
             var actual = Math.limit(x, min, max);
+            // ReSharper disable once PossiblyUnassignedProperty
             expect(actual).to.equal(expected);
         };
 
