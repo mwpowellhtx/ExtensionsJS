@@ -1,7 +1,7 @@
 {
     "name": "extensionsjs-boolean",
     "description": "Provides useful prototype methods extending Boolean functionality.",
-    "version": "1.0.2",
+    "version": "1.0.3",
     "author": "Michael W Powell",
     "repository": {
         "type": "git",
