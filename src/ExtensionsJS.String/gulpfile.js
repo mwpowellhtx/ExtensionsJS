@@ -31,6 +31,7 @@ var crc2json = require("crc2json");
 var cfg = {
     name: "extensionsjs-string",
     src: "str.js",
+    minSrc: "str.min.js",
     pkgJson: "package.json",
     rootDir: path.join(".", "Scripts", "ExtensionsJS"),
     binDir: path.join(".", "bin"),
@@ -112,7 +113,9 @@ gulp.task("createTarballPackage",
 
 gulp.task("createPackageRegistryDir",
     function() {
-        var repoDir = path.resolve(path.join(cfg.regRootDir, cfg.name)).replace(/\\/g, "/");
+        // We will assume that the Version has been appropriately bumped.
+        var version = json.sync(path.join(cfg.binDir, cfg.pkgJson)).version;
+        var repoDir = path.join(path.join(cfg.regRootDir, cfg.name, version));
         if (fs.exists(repoDir)) {
             console.log("Package registry directory '" + repoDir + "' exists.");
         } else {
@@ -121,86 +124,100 @@ gulp.task("createPackageRegistryDir",
         }
     });
 
-gulp.task("publishPackageToLocalRegistry",
-    ["createTarballPackage", "createPackageRegistryDir"],
+// TODO: TBD: rinse and repeat from Array ExtensionsJS...
+gulp.task("publishPackageToLocalDir",
+    ["minify", "stage", "createPackageRegistryDir"],
     function() {
-        var repoDir = path.join(cfg.regRootDir, cfg.name);
-        git.cwd(repoDir);
-        var tarballName = cfg.name + ".tar.gz";
-        var commitAndTagPackage = () => {
-            var pkg = json.sync(path.join(cfg.binDir, cfg.pkgJson));
-            // We will assume that the Version has been appropriately bumped.
-            var version = pkg.version;
-            git.commit("publishing package version " + version,
-                tarballName,
-                cerr => {
-                    if (cerr) {
-                        throw cerr;
-                    }
-                    git.tag([version, "--force"],
-                        terr => {
-                            if (terr) {
-                                throw terr;
-                            }
-                        });
-                });
-        };
-        var doPublish = () => {
-            var srcDir = cfg.distDir;
-            var copyOpts = { matching: tarballName };
-            if (fs.exists(path.join(repoDir, tarballName))) {
-                /* We need to compare a couple of CRC32 results in order to determine whether to
-                copy in the first place. Note, due to the asynchronous nature of these callbacks,
-                we need to be careful about what to nest during which callback. */
-                var processPathCrc = (rootDir, callback) => {
-                    crc2json(rootDir,
-                        map => {
-                            // We need to sift through the entries for the requested value.
-                            var value = undefined;
-                            // ReSharper disable once MissingHasOwnPropertyInForeach
-                            for (var k in map) {
-                                // Checking for having own property does not work here for whatever reason.
-                                if (k.endsWith(tarballName)) {
-                                    value = map[k];
-                                    break;
-                                }
-                            }
-                            callback(value);
-                        });
-                };
-                processPathCrc(srcDir,
-                    x => {
-                        processPathCrc(repoDir,
-                            y => {
-                                copyOpts.overwrite = () => x !== y;
-                                fs.copy(srcDir, repoDir, copyOpts);
-                                commitAndTagPackage();
-                            });
-                    });
-            } else {
-                /* Otherwise, simply copy the package when it does not exist. We must still
-                specify overwrite, even though technically there is nothing to overwrite. */
-                copyOpts.overwrite = () => true;
-                fs.copy(srcDir, repoDir, copyOpts);
-                git.add([tarballName]);
-                commitAndTagPackage();
+        var version = json.sync(path.join(cfg.binDir, cfg.pkgJson)).version;
+        var repoDir = path.join(cfg.regRootDir, cfg.name, version).replace(/\\/g, "/");
+        var items = [
+            { name: cfg.src },
+            { name: cfg.minSrc },
+            { name: cfg.pkgJson }
+        ];
+        var processedItems = [];
+        var archive = function() {
+            if (!processedItems.length) {
+                return;
             }
-        };
-        // ReSharper disable once PossiblyUnassignedProperty
-        if (fs.exists(path.join(repoDir, cfg.gitDir)) &&
-            git.checkIsRepo(err => {
-                if (err) {
-                    throw err;
+            var commitPackages = function() {
+                git.commit("publishing " + cfg.name + " " + version);
+            };
+            var addPackages = function() {
+                git.cwd(repoDir);
+                var addingItems = [];
+                var updatingItems = [];
+                for (var j = 0; j < processedItems.length; j++) {
+                    if (processedItems[j].adding) {
+                        addingItems.push(processedItems[j].name);
+                    }
+                    if (processedItems[j].updating) {
+                        updatingItems.push(processedItems[j].name);
+                    }
                 }
-            })) {
-            doPublish();
-        } else {
-            git.init(false,
-                err => {
+                if (addingItems.length) {
+                    git.add(addingItems,
+                        () => {
+                            commitPackages();
+                        });
+                } else if (updatingItems.length) {
+                    commitPackages();
+                }
+            };
+            git.cwd(cfg.regRootDir);
+            if (fs.exists(path.join(cfg.regRootDir, cfg.gitDir).replace(/\\/g, "/")) &&
+                // ReSharper disable once PossiblyUnassignedProperty
+                git.checkIsRepo(err => {
                     if (err) {
                         throw err;
                     }
-                    doPublish();
+                })) {
+                addPackages();
+            } else {
+                git.init(false,
+                    err => {
+                        if (err) {
+                            throw err;
+                        }
+                        addPackages();
+                    });
+            }
+        };
+        var processPathCrc = (rootDir, info, callback) => {
+            crc2json(rootDir,
+                map => {
+                    // We need to sift through the entries for the requested value.
+                    var value = undefined;
+                    // ReSharper disable once MissingHasOwnPropertyInForeach
+                    for (var k in map) {
+                        // Checking for having own property does not work here for whatever reason.
+                        if (k.endsWith(info.name)) {
+                            value = map[k];
+                            break;
+                        }
+                    }
+                    callback(info, value);
+                });
+        };
+        for (var i = 0; i < items.length; i++) {
+            /* We are likely to get tripped up over the timing of functional callbacks here. But
+            we will make an effort to string together the series of events that we are interested
+            in achieving. */
+            processPathCrc(cfg.binDir,
+                items[i],
+                (a, x) => {
+                    processPathCrc(repoDir,
+                        a,
+                        (b, y) => {
+                            var src = path.join(cfg.binDir, b.name).replace(/\\/g, "/");
+                            var dest = path.join(repoDir, b.name).replace(/\\/g, "/");
+                            b.adding = x && y === undefined;
+                            b.updating = x && y && x !== y;
+                            fs.copy(src, dest, { overwrite: b.adding || b.updating });
+                            if (processedItems.push(b) === items.length) {
+                                archive();
+                            }
+                        });
                 });
         }
     });
