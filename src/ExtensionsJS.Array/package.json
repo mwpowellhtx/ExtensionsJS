@@ -1,7 +1,7 @@
 {
     "name": "extensionsjs-array",
     "description": "Provides useful prototype methods extending Array functionality.",
-    "version": "1.4.5",
+    "version": "1.4.7",
     "author": "Michael W Powell",
     "repository": {
         "type": "git",

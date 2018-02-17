@@ -35,14 +35,18 @@ favor of possibly Eclipse based hosting. */
 var cfg = {
     name: "extensionsjs-array",
     src: "arr.js",
+    minSrc: "arr.min.js",
     pkgJson: "package.json",
     rootDir: path.join(".", "Scripts", "ExtensionsJS"),
     binDir: path.join(".", "bin"),
     specDirs: path.join(".", "spec", "**"),
     distDir: path.join(".", "bin", "dist"),
     gitDir: ".git",
-    // Assumes some organizational structure about the Solution and Project directories.
-    regRootDir: path.join("..", "..", "..", "..", "Node.js", "Registries")
+    /* Make sure that projects are Cloned with sufficient directory depth in order to allow
+    Registries publication, i.e. /source/company/js/ExtensionsJS/repoClone/src/projectName/.../.
+                                                    4.           3.        2.  1.
+    */
+    regRootDir: path.resolve(path.join("..", "..", "..", "..", "Node.js", "Registries")).replace(/\\/g, "/")
 };
 
 gulp.task("clean",
@@ -72,7 +76,7 @@ gulp.task("stage",
     });
 
 gulp.task("minify",
-    function() {
+    function () {
         // More AWESOMENESS!
         return gulp.src(path.join(cfg.rootDir, "*.js"))
             .pipe(minify({
@@ -116,7 +120,9 @@ gulp.task("createTarballPackage",
 
 gulp.task("createPackageRegistryDir",
     function() {
-        var repoDir = path.resolve(path.join(cfg.regRootDir, cfg.name)).replace(/\\/g, "/");
+        // We will assume that the Version has been appropriately bumped.
+        var version = json.sync(path.join(cfg.binDir, cfg.pkgJson)).version;
+        var repoDir = path.join(path.join(cfg.regRootDir, cfg.name, version));
         if (fs.exists(repoDir)) {
             console.log("Package registry directory '" + repoDir + "' exists.");
         } else {
@@ -125,86 +131,253 @@ gulp.task("createPackageRegistryDir",
         }
     });
 
-gulp.task("publishPackageToLocalRegistry",
-    ["createTarballPackage", "createPackageRegistryDir"],
+/* TODO: TBD: so, a "local" registry could simply be a folder path, including version directory,
+containing simply the package.json and any source and/or docs that may be part of that... that
+would be perfectly sufficient, I would not necessarily need/want to "publish" anything into any
+Git repositories. */
+
+// TODO: TBD: let's also remember; providing this approach is successful, rinse and repeat in the other projects...
+gulp.task("publishPackageToLocalDir",
+    ["minify", "stage", "createPackageRegistryDir"],
     function() {
-        var repoDir = path.join(cfg.regRootDir, cfg.name);
-        git.cwd(repoDir);
-        var tarballName = cfg.name + ".tar.gz";
-        var commitAndTagPackage = () => {
-            var pkg = json.sync(path.join(cfg.binDir, cfg.pkgJson));
-            // We will assume that the Version has been appropriately bumped.
-            var version = pkg.version;
-            git.commit("publishing package version " + version,
-                tarballName,
-                cerr => {
-                    if (cerr) {
-                        throw cerr;
-                    }
-                    git.tag([version, "--force"],
-                        terr => {
-                            if (terr) {
-                                throw terr;
-                            }
-                        });
-                });
-        };
-        var doPublish = () => {
-            var srcDir = cfg.distDir;
-            var copyOpts = { matching: tarballName };
-            if (fs.exists(path.join(repoDir, tarballName))) {
-                /* We need to compare a couple of CRC32 results in order to determine whether to
-                copy in the first place. Note, due to the asynchronous nature of these callbacks,
-                we need to be careful about what to nest during which callback. */
-                var processPathCrc = (rootDir, callback) => {
-                    crc2json(rootDir,
-                        map => {
-                            // We need to sift through the entries for the requested value.
-                            var value = undefined;
-                            // ReSharper disable once MissingHasOwnPropertyInForeach
-                            for (var k in map) {
-                                // Checking for having own property does not work here for whatever reason.
-                                if (k.endsWith(tarballName)) {
-                                    value = map[k];
-                                    break;
-                                }
-                            }
-                            callback(value);
-                        });
-                };
-                processPathCrc(srcDir,
-                    x => {
-                        processPathCrc(repoDir,
-                            y => {
-                                copyOpts.overwrite = () => x !== y;
-                                fs.copy(srcDir, repoDir, copyOpts);
-                                commitAndTagPackage();
-                            });
-                    });
-            } else {
-                /* Otherwise, simply copy the package when it does not exist. We must still
-                specify overwrite, even though technically there is nothing to overwrite. */
-                copyOpts.overwrite = () => true;
-                fs.copy(srcDir, repoDir, copyOpts);
-                git.add([tarballName]);
-                commitAndTagPackage();
+        var version = json.sync(path.join(cfg.binDir, cfg.pkgJson)).version;
+        var repoDir = path.join(cfg.regRootDir, cfg.name, version).replace(/\\/g, "/");
+        // TODO: TBD: re-factor "Git archive" as a separate step following the optional copy here, with appropriate flags captured during copy...
+        // TODO: it does not seem to work quite right, getting hung up on what seems like async operations? during CRC-32?
+        var items = [
+            { name: cfg.src },
+            { name: cfg.minSrc },
+            { name: cfg.pkgJson }
+        ];
+        var processedItems = [];
+        var archive = function() {
+            if (!processedItems.length) {
+                return;
             }
-        };
-        // ReSharper disable once PossiblyUnassignedProperty
-        if (fs.exists(path.join(repoDir, cfg.gitDir)) &&
-            git.checkIsRepo(err => {
-                if (err) {
-                    throw err;
+            // TODO: TBD: there may be enough here well-organized enough that it can run as a follow on function to the core copy operation...
+            var commitPackages = function() {
+                git.commit("publishing " + cfg.name + " " + version);
+            };
+            var addPackages = function() {
+                git.cwd(repoDir);
+                // TODO: TBD: This level of gymnastics is on account of crc2json(...) apparent callback asynchronous behavior.
+                var addingItems = [];
+                var updatingItems = [];
+                for (var j = 0; j < processedItems.length; j++) {
+                    if (processedItems[j].adding) {
+                        addingItems.push(processedItems[j].name);
+                    }
+                    if (processedItems[j].updating) {
+                        updatingItems.push(processedItems[j].name);
+                    }
                 }
-            })) {
-            doPublish();
-        } else {
-            git.init(false,
-                err => {
+                if (addingItems.length) {
+                    git.add(addingItems,
+                        () => {
+                            commitPackages();
+                        });
+                } else if (updatingItems.length) {
+                    commitPackages();
+                }
+            };
+            git.cwd(cfg.regRootDir);
+            if (fs.exists(path.join(cfg.regRootDir, cfg.gitDir).replace(/\\/g, "/")) &&
+                // ReSharper disable once PossiblyUnassignedProperty
+                git.checkIsRepo(err => {
                     if (err) {
                         throw err;
                     }
-                    doPublish();
+                })) {
+                addPackages();
+            } else {
+                git.init(false,
+                    err => {
+                        if (err) {
+                            throw err;
+                        }
+                        addPackages();
+                    });
+            }
+        };
+        var processPathCrc = (rootDir, info, callback) => {
+            crc2json(rootDir,
+                map => {
+                    // We need to sift through the entries for the requested value.
+                    var value = undefined;
+                    // ReSharper disable once MissingHasOwnPropertyInForeach
+                    for (var k in map) {
+                        // Checking for having own property does not work here for whatever reason.
+                        if (k.endsWith(info.name)) {
+                            value = map[k];
+                            break;
+                        }
+                    }
+                    callback(info, value);
+                });
+        };
+        for (var i = 0; i < items.length; i++) {
+            /* We are likely to get tripped up over the timing of functional callbacks here. But
+            we will make an effort to string together the series of events that we are interested
+            in achieving. */
+            processPathCrc(cfg.binDir,
+                items[i],
+                (o, x) => {
+                    processPathCrc(repoDir,
+                        o,
+                        (p, y) => {
+                            var src = path.join(cfg.binDir, p.name).replace(/\\/g, "/");
+                            var dest = path.join(repoDir, p.name).replace(/\\/g, "/");
+                            p.adding = x && y === undefined;
+                            p.updating = x && y && x !== y;
+                            fs.copy(src, dest, { overwrite: p.adding || p.updating });
+                            // TODO: TBD: instead of looking for the last one, it may not be guaranteed on account of crc2json async behavior.
+                            if (processedItems.push(p) === items.length) {
+                                archive();
+                            }
+                        });
                 });
         }
     });
+
+/* TODO: TBD: I will leave this one in for the time being. The heart of this task, however, has
+been refactored as a function within the "publishPackageToLocalDir" task. */
+//gulp.task("commitLocalPackagesToGitArchive",
+//    ["publishPackageToLocalDir"],
+//    function () {
+//        // TODO: TBD: there may be enough here well-organized enough that it can run as a follow on function to the core copy operation...
+//        var version = json.sync(path.join(cfg.binDir, cfg.pkgJson)).version;
+//        var repoDir = path.join(cfg.regRootDir, cfg.name, version).replace(/\\/g, "/");
+//        var items = [cfg.src, cfg.minSrc, cfg.pkgJson];
+//        var commitPackages = function() {
+//            git.commit("publishing " + cfg.name + " " + version);
+//        };
+//        var addPackages = function() {
+//            git.cwd(repoDir);
+//            git.add(items,
+//                () => {
+//                    commitPackages();
+//                });
+//        };
+//        git.cwd(cfg.regRootDir);
+//        // ReSharper disable once PossiblyUnassignedProperty
+//        if (fs.exists(path.join(cfg.regRootDir, cfg.gitDir).replace(/\\/g, "/")) &&
+//            git.checkIsRepo(err => {
+//                if (err) {
+//                    throw err;
+//                }
+//            })) {
+//            addPackages();
+//        } else {
+//            git.init(false,
+//                err => {
+//                    if (err) {
+//                        throw err;
+//                    }
+//                    addPackages();
+//                });
+//        }
+//    });
+
+/* TODO: TBD: The intended outcome here I think is valid, but the approach is broken. There are
+too many callbacks operating in what appears to be an asynchronous manner and getting tongue
+tied as a result. I took a step back, did a little refactoring, and now I think there is a
+potentially viable approach. Make sure, and then rinse and repeat in the other projects. */
+//gulp.task("publishPackageToLocalDir",
+//    ["minify", "stage", "createPackageRegistryDir"],
+//    function() {
+//        var version = json.sync(path.join(cfg.binDir, cfg.pkgJson)).version;
+//        var repoDir = path.join(cfg.regRootDir, cfg.name, version).replace(/\\/g, "/");
+//        console.log("Ensuring directory '" + repoDir + "' exists");
+//        fs.dir(repoDir);
+//        var publishSrcs = function() {
+//            console.log("Git working in directory '" + repoDir + "'");
+//            // Not only copy the file itself, but it would be worthwhile committing to an overarching Git repository.
+//            var items = [cfg.src, cfg.minSrc, cfg.pkgJson];
+//            var addSrcs = [];
+//            for (var i = 0; i < items.length; i++) {
+//                var processPathCrc = (rootDir, name, callback) => {
+//                    crc2json(rootDir,
+//                        map => {
+//                            // We need to sift through the entries for the requested value.
+//                            var value = undefined;
+//                            // ReSharper disable once MissingHasOwnPropertyInForeach
+//                            for (var k in map) {
+//                                // Checking for having own property does not work here for whatever reason.
+//                                // ReSharper disable once ClosureOnModifiedVariable
+//                                if (k.endsWith(name)) {
+//                                    value = map[k];
+//                                    break;
+//                                }
+//                            }
+//                            callback(name, value);
+//                        });
+//                };
+//                processPathCrc(cfg.binDir,
+//                    items[i],
+//                    (s, x) => {
+//                        // ReSharper disable once ClosureOnModifiedVariable
+//                        processPathCrc(repoDir,
+//                            s,
+//                            (t, y) => {
+//                                console.log("Copying '" + t + "' from '" + cfg.binDir + "' to '" + repoDir + "'...");
+//                                // ReSharper disable once ClosureOnModifiedVariable
+//                                fs.copy(cfg.binDir,
+//                                    repoDir,
+//                                    {
+//                                        overwrite: () => (x && y === undefined) || (y && x !== y),
+//                                        matching: t
+//                                    });
+//                                if (!!!y) {
+//                                    // ReSharper disable once ClosureOnModifiedVariable
+//                                    console.log("Published file '" + t + "' did not previously exist...");
+//                                    addSrcs.push(t);
+//                                }
+//                            });
+//                    });
+//            }
+//            var commitSrcs = function() {
+//                console.log("Committing sources...");
+//                git.commit("publishing " + cfg.name + " version " + version,
+//                    items,
+//                    err => {
+//                        if (err) {
+//                            throw err;
+//                        }
+//                    });
+//            };
+//            git.cwd(repoDir);
+//            if (addSrcs.length) {
+//                console.log("Adding sources prior to commit...");
+//                git.add(addSrcs,
+//                    err => {
+//                        if (err) {
+//                            throw err;
+//                        }
+//                        commitSrcs();
+//                    });
+//            } else {
+//                commitSrcs();
+//            }
+//        };
+//        console.log("Git working in directory '" + cfg.regRootDir + "'");
+//        git.cwd(cfg.regRootDir);
+//        // ReSharper disable once PossiblyUnassignedProperty
+//        if (fs.exists(path.join(cfg.regRootDir, cfg.gitDir)) &&
+//            git.checkIsRepo(err => {
+//                if (err) {
+//                    throw err;
+//                }
+//            })) {
+//            console.log("Publishing sources...");
+//            publishSrcs();
+//        } else {
+//            console.log("Initializing Git repository '" + cfg.regRootDir + "'");
+//            git.init(false,
+//                err => {
+//                    if (err) {
+//                        throw err;
+//                    }
+//                    publishSrcs();
+//                });
+//        }
+//    });
