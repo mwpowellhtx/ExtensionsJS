@@ -1,7 +1,7 @@
 {
     "name": "extensionsjs-events",
     "description": "Provides a useful set of Event Dispatching extensions facilitating Event Driven operation that is completely agnostic of any client side frameworks, jQuery, and so on.",
-    "version": "1.2.2",
+    "version": "1.2.3",
     "author": "Michael W Powell",
     "repository": {
         "type": "git",
