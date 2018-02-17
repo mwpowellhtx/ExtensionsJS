@@ -1,0 +1,23 @@
+{
+    "name": "extensionsjs-tests",
+    "description": "Provides a template for which package subscription can be verified.",
+    "version": "1.0.0",
+    "author": "Michael W Powell",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/mwpowellhtx/ExtensionsJS.git"
+    },
+    "license": "GPL-3.0",
+    "files": [],
+    "devDependencies": {
+        "extensionsjs-array": "../../../../Node.js/Registries/extensionsjs-array/1.4.7",
+        "extensionsjs-boolean": "../../../../Node.js/Registries/extensionsjs-boolean/1.0.3",
+        "extensionsjs-events": "../../../../Node.js/Registries/extensionsjs-events/1.2.3",
+        "extensionsjs-math": "../../../../Node.js/Registries/extensionsjs-math/1.0.3",
+        "extensionsjs-number": "../../../../Node.js/Registries/extensionsjs-number/1.0.3",
+        "extensionsjs-string": "../../../../Node.js/Registries/extensionsjs-string/1.1.4"
+    },
+    "dependencies": {},
+    "scripts": {},
+    "keywords": []
+}
